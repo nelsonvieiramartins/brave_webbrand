@@ -60,19 +60,7 @@
                   <div class="window-dot green"></div>
                   <span class="window-title">brave_engine.v2.py</span>
                 </div>
-                <pre class="code-content">
-<span class="clr-pink">class</span> BraveEngine:
-    <span class="clr-pink">def</span> __init__(self, scalability=True):
-        self.core = <span class="clr-yellow">'High Performance'</span>
-        self.security = <span class="clr-yellow">'Military Grade'</span>
-
-    <span class="clr-pink">async def</span> deploy_success(self, project):
-        await self.optimize_loading(project)
-        <span class="clr-pink">return</span> {<span class="clr-cyan">'status'</span>: <span class="clr-yellow">'200 OK'</span>, <span class="clr-cyan">'growth'</span>: <span class="clr-yellow">'Exponential'</span>}
-
-<span class="clr-gray"># Deploying future-proof digital assets</span>
-engine = BraveEngine(scalability=True)
-print(engine.deploy_success(<span class="clr-yellow">'YourBusiness'</span>))</pre>
+                <pre class="code-content" id="code-terminal"></pre>
               </div>
               <!-- Decorative elements -->
               <div class="glow-blob cyan bottom-right"></div>
@@ -290,5 +278,118 @@ print(engine.deploy_success(<span class="clr-yellow">'YourBusiness'</span>))</pr
     </footer>
   </div>
   <script src="main.js"></script>
+  <script>
+  (function () {
+    // ── Code lines: each entry is { html, pause }
+    // html = raw HTML with color spans; pause = ms to wait after typing the line
+    const LINES = [
+      { h: '<span class="clr-pink">class</span> BraveEngine:', p: 280 },
+      { h: '    <span class="clr-pink">def</span> __init__(self, scalability=True):', p: 220 },
+      { h: '        self.core = <span class="clr-yellow">\'High Performance\'</span>', p: 180 },
+      { h: '        self.security = <span class="clr-yellow">\'Military Grade\'</span>', p: 320 },
+      { h: '', p: 180 },
+      { h: '    <span class="clr-pink">async def</span> deploy_success(self, project):', p: 240 },
+      { h: '        await self.optimize_loading(project)', p: 200 },
+      { h: '        <span class="clr-pink">return</span> {<span class="clr-cyan">\'status\'</span>: <span class="clr-yellow">\'200 OK\'</span>, <span class="clr-cyan">\'growth\'</span>: <span class="clr-yellow">\'Exponential\'</span>}', p: 380 },
+      { h: '', p: 180 },
+      { h: '    <span class="clr-pink">async def</span> scale_infrastructure(self, tier):', p: 240 },
+      { h: '        nodes = await self.provision_nodes(tier)', p: 200 },
+      { h: '        <span class="clr-pink">return</span> {<span class="clr-cyan">\'nodes\'</span>: nodes, <span class="clr-cyan">\'latency\'</span>: <span class="clr-yellow">\'&lt;50ms\'</span>}', p: 320 },
+      { h: '', p: 180 },
+      { h: '<span class="clr-gray"># Deploying future-proof digital assets</span>', p: 260 },
+      { h: 'engine = BraveEngine(scalability=True)', p: 200 },
+      { h: 'print(engine.deploy_success(<span class="clr-yellow">\'YourBusiness\'</span>))', p: 480 },
+      { h: '', p: 200 },
+      { h: '<span class="clr-gray"># → Output: {\'status\': \'200 OK\', \'growth\': \'Exponential\'}</span>', p: 600 },
+      { h: '', p: 200 },
+      { h: '<span class="clr-gray"># Scaling to next tier...</span>', p: 260 },
+      { h: 'engine.scale_infrastructure(<span class="clr-yellow">\'enterprise\'</span>)', p: 480 },
+      { h: '', p: 200 },
+      { h: '<span class="clr-gray"># → {\'nodes\': 24, \'latency\': \'&lt;50ms\'}</span>', p: 900 },
+    ];
+
+    const CHAR_DELAY = 28;   // ms per character
+    const RESTART_PAUSE = 2200; // ms before restarting loop
+
+    const terminal = document.getElementById('code-terminal');
+    if (!terminal) return;
+
+    // Strip HTML tags to get plain text length for typing
+    function textLength(html) {
+      const tmp = document.createElement('span');
+      tmp.innerHTML = html;
+      return tmp.textContent.length;
+    }
+
+    // Build the visible HTML char-by-char by revealing characters
+    // We type the plain text; once complete, swap to full HTML
+    function typeLine(lineHtml, onDone) {
+      const plain = (() => {
+        const t = document.createElement('span');
+        t.innerHTML = lineHtml;
+        return t.textContent;
+      })();
+
+      // Add a new <span> for this line
+      const lineEl = document.createElement('span');
+      terminal.insertBefore(lineEl, cursor);
+
+      let i = 0;
+      function tick() {
+        i++;
+        // Show partial plain text while typing, full HTML when done
+        lineEl.textContent = plain.slice(0, i);
+        terminal.scrollTop = terminal.scrollHeight;
+        if (i < plain.length) {
+          setTimeout(tick, CHAR_DELAY);
+        } else {
+          lineEl.innerHTML = lineHtml; // reveal colors
+          onDone();
+        }
+      }
+      if (plain.length === 0) {
+        lineEl.innerHTML = '<br>';
+        onDone();
+      } else {
+        tick();
+      }
+    }
+
+    // Cursor element
+    const cursor = document.createElement('span');
+    cursor.className = 'code-cursor';
+    terminal.appendChild(cursor);
+
+    let lineIndex = 0;
+
+    function nextLine() {
+      if (lineIndex >= LINES.length) {
+        // Restart: clear and loop
+        setTimeout(() => {
+          // Remove all children except cursor
+          while (terminal.firstChild && terminal.firstChild !== cursor) {
+            terminal.removeChild(terminal.firstChild);
+          }
+          terminal.scrollTop = 0;
+          lineIndex = 0;
+          nextLine();
+        }, RESTART_PAUSE);
+        return;
+      }
+
+      const { h, p } = LINES[lineIndex++];
+      typeLine(h, () => {
+        // Add newline node
+        const br = document.createElement('span');
+        br.textContent = '\n';
+        terminal.insertBefore(br, cursor);
+        terminal.scrollTop = terminal.scrollHeight;
+        setTimeout(nextLine, p);
+      });
+    }
+
+    nextLine();
+  })();
+  </script>
 </body>
 </html>

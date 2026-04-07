@@ -1224,10 +1224,26 @@ img {
   font-size: 12px;
   font-family: monospace;
   color: var(--color-gray-400);
-  line-height: 1.5;
-  overflow-x: auto;
+  line-height: 1.8;
+  overflow: hidden;
+  max-height: 260px;
+  scroll-behavior: smooth;
 }
-@media (min-width: 768px) { .code-content { font-size: 14px; } }
+@media (min-width: 768px) { .code-content { font-size: 14px; max-height: 300px; } }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+.code-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #f472b6;
+  vertical-align: text-bottom;
+  margin-left: 1px;
+  animation: blink 0.9s step-end infinite;
+}
 
 .clr-pink { color: #f472b6; }
 .clr-yellow { color: #fef08a; }
