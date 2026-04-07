@@ -472,17 +472,11 @@ img {
 
 .screen-slide {
   position: absolute;
-  inset: 0;
+  top: 0; left: 0;
   width: 100%;
   height: auto;
   display: block;
   opacity: 0;
-  transition: opacity 0.9s ease;
-  will-change: transform, opacity;
-}
-
-.screen-slide.active {
-  opacity: 0.93;
 }
 
 .screen-glare {
