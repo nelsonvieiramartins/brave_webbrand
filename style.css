@@ -463,28 +463,26 @@ img {
   }
 }
 
-/* Screen scroll animation */
-@keyframes screen-scroll {
-  0%   { transform: translateY(0); }
-  8%   { transform: translateY(0); }          /* pause at top */
-  78%  { transform: translateY(-55%); }
-  90%  { transform: translateY(-55%); }       /* pause at bottom */
-  100% { transform: translateY(0); }
-}
-
+/* ── Screen slideshow ── */
 .screen-scroll-wrapper {
   position: absolute;
   inset: 0;
   overflow: hidden;
 }
 
-.screen-scroll-img {
+.screen-slide {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: auto;
   display: block;
-  opacity: 0.92;
-  animation: screen-scroll 16s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-  will-change: transform;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+  will-change: transform, opacity;
+}
+
+.screen-slide.active {
+  opacity: 0.93;
 }
 
 .screen-glare {
