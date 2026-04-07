@@ -1194,6 +1194,9 @@ img {
   position: relative;
   z-index: 10;
   overflow: hidden;
+  height: 362px;
+  display: flex;
+  flex-direction: column;
 }
 
 .code-window-header {
@@ -1226,10 +1229,10 @@ img {
   color: var(--color-gray-400);
   line-height: 1.8;
   overflow: hidden;
-  max-height: 260px;
+  flex: 1;
   scroll-behavior: smooth;
 }
-@media (min-width: 768px) { .code-content { font-size: 14px; max-height: 300px; } }
+@media (min-width: 768px) { .code-content { font-size: 14px; } }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
