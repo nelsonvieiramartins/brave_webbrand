@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RF1 Consig | Case Study | Brave Agência Digital</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  <style>
+    /* ── Case Study Styles ── */
+
+    .case-hero {
+      position: relative;
+      width: 100%;
+      height: 70vh;
+      min-height: 420px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .case-hero__img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    .case-hero__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.3) 55%, rgba(0,0,0,0.05) 100%);
+    }
+
+    .case-hero__content {
+      position: relative;
+      z-index: 2;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .case-hero__badges {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .case-badge {
+      display: inline-block;
+      padding: 5px 14px;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .case-hero__title {
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.1;
+      margin: 0;
+      letter-spacing: -0.02em;
+    }
+
+    /* ── Meta Bar ── */
+
+    .case-meta-bar {
+      background: #fff;
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    .case-meta-bar__inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      gap: 0;
+    }
+
+    .case-meta-item {
+      flex: 1;
+      padding: 28px 0;
+      border-right: 1px solid var(--color-gray-200);
+    }
+
+    .case-meta-item:last-child {
+      border-right: none;
+    }
+
+    .case-meta-item + .case-meta-item {
+      padding-left: 32px;
+    }
+
+    .case-meta-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-gray-400);
+      margin-bottom: 6px;
+    }
+
+    .case-meta-value {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-gray-900);
+    }
+
+    /* ── Body ── */
+
+    .case-body {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 24px;
+    }
+
+    .case-section {
+      margin-bottom: 80px;
+    }
+
+    .case-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-gray-400);
+      margin-bottom: 16px;
+    }
+
+    .case-section h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700;
+      color: var(--color-gray-900);
+      line-height: 1.2;
+      margin: 0 0 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .case-section p {
+      font-size: 17px;
+      line-height: 1.75;
+      color: var(--color-gray-600);
+      margin: 0;
+    }
+
+    /* ── Full Bleed Image ── */
+
+    .case-full-bleed-wrap {
+      margin-bottom: 80px;
+    }
+
+    .case-full-bleed {
+      display: block;
+      width: 100vw;
+      margin-left: calc(-50vw + 50%);
+      max-height: 90vh;
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    /* ── Result Box ── */
+
+    .case-result-box {
+      background: var(--color-gray-900);
+      color: #fff;
+      border-radius: 24px;
+      padding: 56px 48px;
+      margin-bottom: 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .case-result-box::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+
+    .case-result-metric {
+      font-size: clamp(3rem, 8vw, 5.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: #fff;
+      display: block;
+      margin-bottom: 16px;
+    }
+
+    .case-result-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      display: block;
+      margin-bottom: 20px;
+    }
+
+    .case-result-desc {
+      font-size: 17px;
+      line-height: 1.65;
+      color: rgba(255,255,255,0.7);
+      max-width: 560px;
+    }
+
+    /* ── Live URL ── */
+
+    .case-live-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-gray-900);
+      text-decoration: none;
+      border-bottom: 2px solid var(--color-gray-900);
+      padding-bottom: 2px;
+      transition: opacity 0.2s ease;
+    }
+
+    .case-live-link:hover {
+      opacity: 0.6;
+    }
+
+    /* ── Next Project ── */
+
+    .case-next {
+      border-top: 1px solid var(--color-gray-200);
+      padding: 80px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .case-next__label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-gray-400);
+      margin-bottom: 16px;
+    }
+
+    .case-next__link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800;
+      color: var(--color-gray-900);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+      transition: gap 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .case-next__link:hover {
+      gap: 20px;
+    }
+
+    .case-next__arrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background: var(--color-gray-900);
+      color: #fff;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .case-next__link:hover .case-next__arrow {
+      transform: translateX(6px);
+    }
+
+    /* ── Divider ── */
+
+    .case-divider {
+      width: 48px;
+      height: 3px;
+      background: var(--color-gray-900);
+      border: none;
+      margin: 0 0 48px;
+      border-radius: 9999px;
+    }
+
+    /* ── Responsive ── */
+
+    @media (max-width: 768px) {
+      .case-hero__content {
+        padding: 32px 20px;
+      }
+
+      .case-meta-bar__inner {
+        padding: 0 20px;
+        flex-wrap: wrap;
+      }
+
+      .case-meta-item {
+        flex: 0 0 50%;
+        border-right: none;
+        border-bottom: 1px solid var(--color-gray-200);
+        padding: 20px 0;
+      }
+
+      .case-meta-item + .case-meta-item {
+        padding-left: 0;
+      }
+
+      .case-meta-item:nth-child(odd) {
+        border-right: 1px solid var(--color-gray-200);
+        padding-right: 16px;
+      }
+
+      .case-meta-item:nth-child(even) {
+        padding-left: 16px;
+      }
+
+      .case-meta-item:last-child,
+      .case-meta-item:nth-last-child(2):nth-child(odd) {
+        border-bottom: none;
+      }
+
+      .case-body {
+        padding: 56px 20px;
+      }
+
+      .case-result-box {
+        padding: 40px 28px;
+      }
+
+      .case-next {
+        padding: 56px 20px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal-up {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Header -->
+    <header class="header">
+      <div class="container header-inner">
+        <a href="index.html" class="logo-link">
+          <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/265bed1b-7a83-4b68-87a9-fbb24516aae4/1775401410958-85c79e2f/LOGO_EM_BRANCO_4x.png" alt="Brave Logo" class="logo">
+        </a>
+        <nav class="desktop-nav">
+          <a href="index.html" class="nav-item">Home</a>
+          <a href="web.html" class="nav-item">Web</a>
+          <a href="brand.html" class="nav-item">Brand</a>
+          <a href="portfolio.html" class="nav-item active">Portfólio</a>
+          <a href="sobre.html" class="nav-item">Sobre</a>
+          <a href="contato.html" class="nav-item">Contato</a>
+        </nav>
+        <div class="header-cta">
+          <a href="contato.html" class="btn btn-dark">
+            <span>Iniciar Projeto</span>
+            <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+          </a>
+        </div>
+        <button id="btn-mobile-menu" class="mobile-menu-btn">
+          <iconify-icon icon="lucide:menu"></iconify-icon>
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content">
+
+      <!-- Hero -->
+      <section class="case-hero">
+        <img
+          src="img/portfolio/screencapture-nelsonvieiramartins-github-io-rf1consig-preview-index-html-2026-04-07-11_05_36.png"
+          alt="Screenshot do simulador RF1 Consig"
+          class="case-hero__img"
+        >
+        <div class="case-hero__overlay"></div>
+        <div class="case-hero__content">
+          <div class="case-hero__badges reveal-up">
+            <span class="case-badge">Sistema Web</span>
+            <span class="case-badge">Simulador</span>
+            <span class="case-badge">2025</span>
+          </div>
+          <h1 class="case-hero__title reveal-up" style="animation-delay:100ms;">
+            RF1 Consig
+          </h1>
+        </div>
+      </section>
+
+      <!-- Meta Bar -->
+      <div class="case-meta-bar">
+        <div class="case-meta-bar__inner">
+          <div class="case-meta-item">
+            <span class="case-meta-label">Cliente</span>
+            <span class="case-meta-value">RF1 Consig</span>
+          </div>
+          <div class="case-meta-item">
+            <span class="case-meta-label">Ano</span>
+            <span class="case-meta-value">2025</span>
+          </div>
+          <div class="case-meta-item">
+            <span class="case-meta-label">Categoria</span>
+            <span class="case-meta-value">Sistema Web / Simulador</span>
+          </div>
+          <div class="case-meta-item">
+            <span class="case-meta-label">Serviços</span>
+            <span class="case-meta-value">Web Design · Desenvolvimento · UX/UI</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="case-body">
+
+        <!-- Challenge -->
+        <div class="case-section reveal-up">
+          <span class="case-label">Desafio</span>
+          <hr class="case-divider">
+          <h2>Confiança e conversão no mercado de crédito consignado.</h2>
+          <p>Desenvolver um simulador de crédito consignado intuitivo, que transmite confiança e converte visitantes em leads qualificados.</p>
+        </div>
+
+        <!-- Solution -->
+        <div class="case-section reveal-up" style="animation-delay:80ms;">
+          <span class="case-label">Solução</span>
+          <hr class="case-divider">
+          <h2>Simulador interativo com fluxo direto e credibilidade visual.</h2>
+          <p>Interface limpa com simulador interativo em destaque, fluxo simplificado e design que transmite credibilidade financeira.</p>
+        </div>
+
+      </div>
+
+      <!-- Full Bleed Screenshot -->
+      <div class="case-full-bleed-wrap reveal-up">
+        <img
+          src="img/portfolio/screencapture-nelsonvieiramartins-github-io-rf1consig-preview-index-html-2026-04-07-11_05_36.png"
+          alt="RF1 Consig — visão completa do simulador"
+          class="case-full-bleed"
+        >
+      </div>
+
+      <!-- Result + Live Link -->
+      <div class="case-body" style="padding-top: 0;">
+
+        <!-- Result Box -->
+        <div class="case-result-box reveal-up">
+          <span class="case-result-label">Resultado</span>
+          <span class="case-result-metric">3×</span>
+          <p class="case-result-desc">Taxa de conversão de leads 3x superior à média do segmento.</p>
+        </div>
+
+        <!-- Live URL -->
+        <div class="case-section reveal-up" style="animation-delay:60ms;">
+          <span class="case-label">Ver ao vivo</span>
+          <hr class="case-divider">
+          <a
+            href="https://nelsonvieiramartins.github.io/rf1consig/preview/index.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="case-live-link"
+          >
+            nelsonvieiramartins.github.io/rf1consig
+            <iconify-icon icon="lucide:arrow-up-right"></iconify-icon>
+          </a>
+        </div>
+
+        <!-- Next Project -->
+        <div class="case-next reveal-up" style="animation-delay:40ms;">
+          <span class="case-next__label">Próximo projeto</span>
+          <a href="case-fatdrive.html" class="case-next__link">
+            Fat Drive Factory
+            <span class="case-next__arrow" aria-hidden="true">
+              <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+            </span>
+          </a>
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-col brand-col">
+            <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/265bed1b-7a83-4b68-87a9-fbb24516aae4/1775401410958-85c79e2f/LOGO_EM_BRANCO_4x.png" alt="Brave" class="footer-logo">
+            <p class="footer-desc">Criamos a alma da sua marca e o motor do seu negócio digital. Híbridos por natureza.</p>
+          </div>
+
+          <div class="footer-col nav-col">
+            <h4>Navegação</h4>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="web.html">Brave WEB</a></li>
+              <li><a href="brand.html">Brave ID</a></li>
+              <li><a href="portfolio.html">Portfólio</a></li>
+              <li><a href="sobre.html">Sobre Nós</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col social-col">
+            <h4>Conectar</h4>
+            <ul class="contact-list">
+              <li><a href="#">hello@wearebrave.com</a></li>
+              <li><a href="#">+55 11 9999-9999</a></li>
+            </ul>
+            <div class="social-links">
+              <a href="#" class="social-icon"><iconify-icon icon="ri:instagram-line"></iconify-icon></a>
+              <a href="#" class="social-icon"><iconify-icon icon="ri:linkedin-fill"></iconify-icon></a>
+              <a href="#" class="social-icon"><iconify-icon icon="ri:behance-fill"></iconify-icon></a>
+            </div>
+          </div>
+
+          <div class="footer-col news-col">
+            <h4>Receba nossas novidades</h4>
+            <p>Insights sobre design, tecnologia e tendências direto na sua caixa de entrada.</p>
+            <form class="newsletter-form">
+              <input type="email" placeholder="Seu melhor e-mail" required>
+              <button type="submit" class="submit-arrow"><iconify-icon icon="lucide:arrow-right"></iconify-icon></button>
+            </form>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>© 2024 Brave Agency. Todos os direitos reservados.</p>
+          <div class="legal-links">
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Termos de Serviço</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
