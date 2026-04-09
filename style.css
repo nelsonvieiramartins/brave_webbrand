@@ -848,6 +848,9 @@ img {
   margin-bottom: 48px;
   font-weight: 500;
   max-width: 672px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 @media (min-width: 768px) { .cta-subtitle { font-size: 20px; } }
 
