@@ -158,19 +158,38 @@
       margin: 0;
     }
 
-    /* ── Full Bleed Image ── */
+    /* ── O Projeto — scroll viewport ── */
 
-    .case-full-bleed-wrap {
+    .case-project-section {
       margin-bottom: 80px;
     }
 
-    .case-full-bleed {
-      display: block;
+    .case-project-label {
+      max-width: 900px;
+      margin: 0 auto 28px;
+      padding: 0 24px;
+    }
+
+    .case-scroll-viewport {
       width: 100vw;
       margin-left: calc(-50vw + 50%);
-      max-height: 90vh;
-      object-fit: cover;
-      object-position: top center;
+      height: 75vh;
+      min-height: 400px;
+      overflow: hidden;
+      position: relative;
+      background: #f3f4f6;
+      border-top: 1px solid var(--color-gray-200);
+      border-bottom: 1px solid var(--color-gray-200);
+    }
+
+    .case-scroll-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      will-change: transform;
     }
 
     /* ── Result Box ── */
@@ -456,13 +475,20 @@
 
       </div>
 
-      <!-- Full Bleed Screenshot -->
-      <div class="case-full-bleed-wrap reveal-up">
-        <img
-          src="img/portfolio/screencapture-fatdrivefactory-br-2026-04-07-09_56_58.png"
-          alt="Fat Drive Factory — visão completa do site"
-          class="case-full-bleed"
-        >
+      <!-- O Projeto — scroll automático -->
+      <div class="case-project-section reveal-up">
+        <div class="case-project-label">
+          <span class="case-label">O Projeto</span>
+          <hr class="case-divider">
+        </div>
+        <div class="case-scroll-viewport" id="case-scroll-viewport">
+          <img
+            src="img/portfolio/screencapture-fatdrivefactory-br-2026-04-07-09_56_58.png"
+            alt="Fat Drive Factory — visão completa do site"
+            class="case-scroll-img"
+            id="case-scroll-img"
+          >
+        </div>
       </div>
 
       <!-- Result + Live Link -->
@@ -559,5 +585,42 @@
     </footer>
   </div>
   <script src="main.js"></script>
+  <script>
+    (function () {
+      const viewport = document.getElementById('case-scroll-viewport');
+      const img = document.getElementById('case-scroll-img');
+      if (!viewport || !img) return;
+
+      const PAUSE_TOP    = 1200;
+      const SCROLL_DOWN  = 10000;
+      const PAUSE_BOTTOM = 1800;
+      const SCROLL_UP    = 5000;
+
+      function startScroll() {
+        const dist = Math.max(0, img.offsetHeight - viewport.offsetHeight);
+        if (dist < 10) return; // image fits, no scroll needed
+
+        img.style.transition = 'none';
+        img.style.transform = 'translateY(0)';
+
+        setTimeout(() => {
+          img.style.transition = `transform ${SCROLL_DOWN}ms cubic-bezier(0.4, 0, 0.6, 1)`;
+          img.style.transform = `translateY(-${dist}px)`;
+
+          setTimeout(() => {
+            img.style.transition = `transform ${SCROLL_UP}ms cubic-bezier(0.4, 0, 0.6, 1)`;
+            img.style.transform = 'translateY(0)';
+            setTimeout(startScroll, SCROLL_UP + PAUSE_TOP);
+          }, SCROLL_DOWN + PAUSE_BOTTOM);
+        }, PAUSE_TOP);
+      }
+
+      if (img.complete && img.naturalWidth) {
+        startScroll();
+      } else {
+        img.onload = startScroll;
+      }
+    })();
+  </script>
 </body>
 </html>

@@ -379,13 +379,23 @@
                 </div>
 
                 <div class="form-group span-2">
-                  <label for="p-image">Imagem de capa</label>
+                  <label for="p-image">Capa <span style="font-weight:400;color:#9ca3af;">(thumbnail do portfólio)</span></label>
                   <input type="file" id="p-image" accept="image/*">
-                  <p class="upload-hint">JPG, PNG ou WEBP. Será enviada para o Supabase Storage.</p>
+                  <p class="upload-hint">Imagem usada no card do portfólio. JPG, PNG ou WEBP.</p>
                   <div class="img-preview" id="p-img-preview">
                     <img id="p-img-preview-img" src="" alt="Preview">
                   </div>
                   <input type="hidden" id="p-image-url">
+                </div>
+
+                <div class="form-group span-2">
+                  <label for="p-project-image">O Projeto <span style="font-weight:400;color:#9ca3af;">(screenshot completo para o case study)</span></label>
+                  <input type="file" id="p-project-image" accept="image/*">
+                  <p class="upload-hint">Screenshot longa do site — será exibida com animação de scroll automático na página do case. JPG ou PNG.</p>
+                  <div class="img-preview" id="p-project-img-preview">
+                    <img id="p-project-img-preview-img" src="" alt="Preview">
+                  </div>
+                  <input type="hidden" id="p-project-image-url">
                 </div>
 
                 <div class="form-group span-2">
@@ -658,6 +668,8 @@
       document.getElementById('p-visible').checked = true;
       document.getElementById('p-image-url').value = '';
       document.getElementById('p-img-preview').classList.remove('visible');
+      document.getElementById('p-project-image-url').value = '';
+      document.getElementById('p-project-img-preview').classList.remove('visible');
       document.getElementById('project-panel-title').textContent = id ? 'Editar Projeto' : 'Novo Projeto';
 
       if (id) {
@@ -678,6 +690,11 @@
             document.getElementById('p-img-preview-img').src = data.image_url;
             document.getElementById('p-img-preview').classList.add('visible');
           }
+          if (data.project_image_url) {
+            document.getElementById('p-project-image-url').value = data.project_image_url;
+            document.getElementById('p-project-img-preview-img').src = data.project_image_url;
+            document.getElementById('p-project-img-preview').classList.add('visible');
+          }
         }
       }
       showEditPanel('projects-list-view', 'project-edit-panel');
@@ -690,6 +707,17 @@
       reader.onload = e => {
         document.getElementById('p-img-preview-img').src = e.target.result;
         document.getElementById('p-img-preview').classList.add('visible');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('p-project-image').addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById('p-project-img-preview-img').src = e.target.result;
+        document.getElementById('p-project-img-preview').classList.add('visible');
       };
       reader.readAsDataURL(file);
     });
@@ -707,11 +735,16 @@
         const fileInput = document.getElementById('p-image');
         if (fileInput.files.length > 0) imageUrl = await uploadImage(fileInput.files[0], 'portfolio-images');
 
+        let projectImageUrl = document.getElementById('p-project-image-url').value;
+        const projectFileInput = document.getElementById('p-project-image');
+        if (projectFileInput.files.length > 0) projectImageUrl = await uploadImage(projectFileInput.files[0], 'portfolio-images');
+
         const payload = {
           title: document.getElementById('p-title').value.trim(),
           category: document.getElementById('p-category').value,
           description: document.getElementById('p-description').value.trim(),
           image_url: imageUrl,
+          project_image_url: projectImageUrl,
           live_url: document.getElementById('p-live-url').value.trim(),
           challenge: document.getElementById('p-challenge').value.trim(),
           solution: document.getElementById('p-solution').value.trim(),
