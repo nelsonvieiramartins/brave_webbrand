@@ -156,7 +156,7 @@
         if (delay !== '0ms') a.style.animationDelay = delay;
 
         a.innerHTML = `
-          <img src="${project.image_url || ''}" alt="${project.title}">
+          <img src="${project.image_url || ''}" alt="${project.title}" style="object-position: top center;">
           <div class="project-overlay">
             <div class="project-overlay-content">
               <span class="project-pill">${project.category}</span>
