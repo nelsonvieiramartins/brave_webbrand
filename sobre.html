@@ -96,37 +96,8 @@
             <p class="section-subtitle text-centered">Especialistas unidos pelo desejo de construir algo além do óbvio.</p>
           </div>
 
-          <div class="team-grid">
-            <div class="team-card">
-              <div class="team-img-wrapper">
-                <img src="img/quemsomos/nelsonvieiramartins.webp" alt="Nelson Vieira Martins">
-              </div>
-              <div class="team-info">
-                <h4>Nelson Vieira Martins</h4>
-                <p class="team-role">Diretor de Artes, Web Design & Engenharia de I.A.</p>
-                <p class="team-desc">Unindo inteligência artificial ao design para criar experiências digitais de alto impacto.</p>
-              </div>
-            </div>
-            <div class="team-card">
-              <div class="team-img-wrapper">
-                <img src="img/quemsomos/pierobrito.jpeg" alt="Piero Brito" style="object-position: top;">
-              </div>
-              <div class="team-info">
-                <h4>Piero Brito</h4>
-                <p class="team-role">Dev Master & Especialista em Logística de Dados</p>
-                <p class="team-desc">Arquiteto de sistemas robustos que suportam grandes volumes com performance e precisão.</p>
-              </div>
-            </div>
-            <div class="team-card">
-              <div class="team-img-wrapper">
-                <img src="img/quemsomos/thiagofaguntes.jpeg" alt="Thiago Fagundes">
-              </div>
-              <div class="team-info">
-                <h4>Thiago Fagundes</h4>
-                <p class="team-role">Especialista em Marketing Digital & Planejamento Estratégico</p>
-                <p class="team-desc">Estratégias digitais orientadas a dados que conectam marcas ao público certo no momento certo.</p>
-              </div>
-            </div>
+          <div class="team-grid" id="team-grid">
+            <!-- Populated dynamically -->
           </div>
         </div>
       </section>
@@ -208,5 +179,47 @@
     </footer>
   </div>
   <script src="main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    (function () {
+      const { createClient } = supabase;
+      const sb = createClient(
+        'https://momopryksxaenfwhzrcn.supabase.co',
+        'sb_publishable_0R07eDLCRMSn5BUFmFstxQ_Nybv7qMe'
+      );
+
+      function buildMemberCard(member) {
+        const card = document.createElement('div');
+        card.className = 'team-card';
+        card.innerHTML = `
+          <div class="team-img-wrapper">
+            <img src="${member.photo_url || ''}" alt="${member.name}">
+          </div>
+          <div class="team-info">
+            <h4>${member.name}</h4>
+            <p class="team-role">${member.role || ''}</p>
+            <p class="team-desc">${member.description || ''}</p>
+          </div>
+        `;
+        return card;
+      }
+
+      async function loadTeam() {
+        const grid = document.getElementById('team-grid');
+
+        const { data, error } = await sb
+          .from('team_members')
+          .select('name, role, photo_url, description')
+          .eq('visible', true)
+          .order('sort_order', { ascending: true });
+
+        if (error || !data || !data.length) return;
+
+        data.forEach(member => grid.appendChild(buildMemberCard(member)));
+      }
+
+      loadTeam();
+    })();
+  </script>
 </body>
 </html>

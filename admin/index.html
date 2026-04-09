@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | Brave Agency</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    body {
+      background: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .admin-login-header {
+      background: #111827;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+    }
+
+    .admin-login-header .logo {
+      height: 32px;
+      width: auto;
+    }
+
+    .login-page {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+    }
+
+    .login-card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .login-card h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+
+    .login-card p.subtitle {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      color: #111827;
+      background: #f9fafb;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: #111827;
+      background: #ffffff;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: #111827;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s, opacity 0.2s;
+    }
+
+    .btn-login:hover {
+      background: #1f2937;
+    }
+
+    .btn-login:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .login-error {
+      display: none;
+      margin-top: 16px;
+      padding: 10px 14px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      color: #dc2626;
+      font-size: 0.8125rem;
+    }
+
+    .login-error.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header class="admin-login-header">
+    <a href="../index.html">
+      <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/265bed1b-7a83-4b68-87a9-fbb24516aae4/1775401410958-85c79e2f/LOGO_EM_BRANCO_4x.png" alt="Brave Logo" class="logo">
+    </a>
+  </header>
+
+  <div class="login-page">
+    <div class="login-card">
+      <h1>Painel Admin</h1>
+      <p class="subtitle">Acesso restrito à equipe Brave.</p>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" placeholder="seu@email.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="password">Senha</label>
+          <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-login" id="btn-submit">Entrar</button>
+        <div class="login-error" id="login-error"></div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(
+      'https://momopryksxaenfwhzrcn.supabase.co',
+      'sb_publishable_0R07eDLCRMSn5BUFmFstxQ_Nybv7qMe'
+    );
+
+    (async function checkSession() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) window.location.href = 'dashboard.html';
+    })();
+
+    const form = document.getElementById('login-form');
+    const btnSubmit = document.getElementById('btn-submit');
+    const errorEl = document.getElementById('login-error');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.classList.remove('visible');
+      btnSubmit.disabled = true;
+      btnSubmit.textContent = 'Entrando...';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        errorEl.textContent = 'Credenciais inválidas. Verifique seu e-mail e senha.';
+        errorEl.classList.add('visible');
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = 'Entrar';
+      } else {
+        window.location.href = 'dashboard.html';
+      }
+    });
+  </script>
+</body>
+</html>

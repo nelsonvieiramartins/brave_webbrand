@@ -64,93 +64,11 @@
       <!-- Grid de Projetos -->
       <section class="portfolio-projects-section">
         <div class="container">
-          <div class="portfolio-projects-grid">
-            
-            <!-- Project 1 -->
-            <a href="case-fatdrive.html" class="project-card reveal-up">
-              <img src="img/portfolio/screencapture-fatdrivefactory-br-2026-04-07-09_56_58.png" alt="Fat Drive Factory">
-              <div class="project-overlay">
-                <div class="project-overlay-content">
-                  <span class="project-pill">Website</span>
-                  <h3>Fat Drive Factory</h3>
-                  <p>Presença digital com identidade forte e conversão mobile-first.</p>
-                  <span class="project-link">Ver Case Study <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
-                </div>
-              </div>
-            </a>
-
-            <!-- Project 2 -->
-            <a href="case-rf1consig.html" class="project-card reveal-up" style="animation-delay: 100ms;">
-              <img src="img/portfolio/screencapture-nelsonvieiramartins-github-io-rf1consig-preview-index-html-2026-04-07-11_05_36.png" alt="RF1 Consig">
-              <div class="project-overlay">
-                <div class="project-overlay-content">
-                  <span class="project-pill">Sistema Web / Simulador</span>
-                  <h3>RF1 Consig</h3>
-                  <p>Simulador de crédito consignado com conversão 3x superior à média.</p>
-                  <span class="project-link">Ver Case Study <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
-                </div>
-              </div>
-            </a>
-
-            <!-- Project 3 -->
-            <a href="#case" class="project-card reveal-up" style="animation-delay: 200ms;">
-              <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=1000" alt="RetroVerse">
-              <div class="project-overlay">
-                <div class="project-overlay-content">
-                  <span class="project-pill">Web + ID</span>
-                  <h3>RetroVerse AI</h3>
-                  <p>Experiência imersiva para startup de inteligência artificial generativa.</p>
-                  <span class="project-link">Ver Case Study <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
-                </div>
-              </div>
-            </a>
-
-            <!-- Project 4 -->
-            <a href="#case" class="project-card reveal-up">
-              <img src="https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=1000" alt="Horizon Logistics">
-              <div class="project-overlay">
-                <div class="project-overlay-content">
-                  <span class="project-pill">Sistemas</span>
-                  <h3>Horizon Logistics</h3>
-                  <p>Simulador de rotas e custos logísticos em tempo real.</p>
-                  <span class="project-link">Ver Case Study <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
-                </div>
-              </div>
-            </a>
-
-            <!-- Project 5 -->
-            <a href="#case" class="project-card reveal-up" style="animation-delay: 100ms;">
-              <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=1000" alt="Veloce Team">
-              <div class="project-overlay">
-                <div class="project-overlay-content">
-                  <span class="project-pill">Web Design</span>
-                  <h3>Veloce EdTech</h3>
-                  <p>Plataforma educacional escalável com foco em UX para dispositivos móveis.</p>
-                  <span class="project-link">Ver Case Study <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
-                </div>
-              </div>
-            </a>
-
-            <!-- Project 6 -->
-            <a href="#case" class="project-card reveal-up" style="animation-delay: 200ms;">
-              <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80&w=1000" alt="Lumina Real Estate">
-              <div class="project-overlay">
-                <div class="project-overlay-content">
-                  <span class="project-pill">Identidade Visual</span>
-                  <h3>Lumina Real Estate</h3>
-                  <p>Branding sofisticado para mercado imobiliário de luxo.</p>
-                  <span class="project-link">Ver Case Study <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
-                </div>
-              </div>
-            </a>
+          <div class="portfolio-projects-grid" id="projects-grid">
+            <!-- Populated dynamically -->
           </div>
-
-          <!-- Pagination / Load More -->
-          <div class="portfolio-load-more">
-            <button class="btn btn-outline btn-large">
-              Carregar mais projetos
-              <iconify-icon icon="lucide:plus"></iconify-icon>
-            </button>
+          <div id="portfolio-empty" style="display:none; padding: 64px 0; text-align:center; color:#9ca3af; font-size:0.9375rem;">
+            Nenhum projeto disponível no momento.
           </div>
         </div>
       </section>
@@ -211,5 +129,66 @@
     </footer>
   </div>
   <script src="main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    (function () {
+      const { createClient } = supabase;
+      const sb = createClient(
+        'https://momopryksxaenfwhzrcn.supabase.co',
+        'sb_publishable_0R07eDLCRMSn5BUFmFstxQ_Nybv7qMe'
+      );
+
+      const CASE_LINKS = {
+        'Fat Drive Factory': 'case-fatdrive.html',
+        'RF1 Consig': 'case-rf1consig.html',
+      };
+
+      const delays = ['0ms', '100ms', '200ms'];
+
+      function buildCard(project, index) {
+        const href = CASE_LINKS[project.title] || '#';
+        const delay = delays[index % delays.length];
+
+        const a = document.createElement('a');
+        a.href = href;
+        a.className = 'project-card reveal-up';
+        if (delay !== '0ms') a.style.animationDelay = delay;
+
+        a.innerHTML = `
+          <img src="${project.image_url || ''}" alt="${project.title}">
+          <div class="project-overlay">
+            <div class="project-overlay-content">
+              <span class="project-pill">${project.category}</span>
+              <h3>${project.title}</h3>
+              <p>${project.description || ''}</p>
+              <span class="project-link">Ver Case Study <iconify-icon icon="lucide:arrow-right"></iconify-icon></span>
+            </div>
+          </div>
+        `;
+
+        return a;
+      }
+
+      async function loadProjects() {
+        const grid = document.getElementById('projects-grid');
+        const empty = document.getElementById('portfolio-empty');
+
+        const { data, error } = await sb
+          .from('portfolio_projects')
+          .select('title, category, description, image_url')
+          .eq('visible', true)
+          .order('sort_order', { ascending: true });
+
+        if (error || !data || !data.length) {
+          empty.style.display = 'block';
+          return;
+        }
+
+        data.forEach((project, i) => grid.appendChild(buildCard(project, i)));
+      }
+
+      loadProjects();
+    })();
+  </script>
 </body>
 </html>

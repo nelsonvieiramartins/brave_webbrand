@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Brave Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- TOP BAR ---- */
+    .topbar {
+      background: #111827;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar .logo {
+      height: 28px;
+      width: auto;
+    }
+
+    .admin-badge {
+      background: #374151;
+      color: #d1d5db;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .btn-signout {
+      background: transparent;
+      border: 1.5px solid #374151;
+      color: #9ca3af;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 6px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-signout:hover {
+      border-color: #9ca3af;
+      color: #f3f4f6;
+    }
+
+    /* ---- LAYOUT ---- */
+    .layout {
+      display: flex;
+      flex: 1;
+    }
+
+    /* ---- SIDEBAR ---- */
+    .sidebar {
+      width: 220px;
+      background: #111827;
+      padding: 28px 0;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-label {
+      padding: 0 20px 12px;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: #4b5563;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .sidebar-nav button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 11px 20px;
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+    }
+
+    .sidebar-nav button:hover {
+      background: #1f2937;
+      color: #f3f4f6;
+    }
+
+    .sidebar-nav button.active {
+      background: #1f2937;
+      color: #f9fafb;
+      border-left-color: #f9fafb;
+    }
+
+    .sidebar-nav button svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ---- CONTENT ---- */
+    .content {
+      flex: 1;
+      padding: 32px;
+      overflow-y: auto;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ---- SECTION HEADER ---- */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .section-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+    }
+
+    /* ---- BUTTONS ---- */
+    .btn-primary {
+      background: #111827;
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary:hover { background: #1f2937; }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      border: none;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-edit { background: #f3f4f6; color: #374151; }
+    .btn-edit:hover { background: #e5e7eb; }
+    .btn-delete { background: #fee2e2; color: #dc2626; }
+    .btn-delete:hover { background: #fecaca; }
+    .btn-save-inline { background: #d1fae5; color: #065f46; }
+    .btn-save-inline:hover { background: #a7f3d0; }
+
+    /* ---- TABLE ---- */
+    .data-table-wrap {
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+    }
+
+    thead th {
+      background: #f9fafb;
+      padding: 11px 16px;
+      text-align: left;
+      font-weight: 600;
+      color: #6b7280;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f3f4f6;
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f9fafb; }
+
+    tbody td {
+      padding: 12px 16px;
+      color: #374151;
+      vertical-align: middle;
+    }
+
+    .td-actions { display: flex; gap: 6px; align-items: center; }
+
+    /* Toggle switch */
+    .toggle {
+      position: relative;
+      width: 36px;
+      height: 20px;
+      display: inline-block;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #d1d5db;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle-track::before {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.2s;
+    }
+
+    .toggle input:checked + .toggle-track { background: #111827; }
+    .toggle input:checked + .toggle-track::before { transform: translateX(16px); }
+
+    .empty-state {
+      padding: 48px;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 0.875rem;
+    }
+
+    /* ---- MODAL ---- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 640px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h3 {
+      font-size: 1.125rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: #f3f4f6;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6b7280;
+    }
+
+    .modal-close:hover { background: #e5e7eb; }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 5px;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.8125rem;
+      color: #111827;
+      background: #f9fafb;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #111827;
+      background: #fff;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-group input[type="checkbox"] {
+      width: auto;
+      margin-right: 8px;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .img-preview {
+      margin-top: 8px;
+      border-radius: 8px;
+      overflow: hidden;
+      max-height: 120px;
+      display: none;
+    }
+
+    .img-preview.visible { display: block; }
+    .img-preview img { width: 100%; height: 120px; object-fit: cover; }
+
+    .upload-hint {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid #f3f4f6;
+    }
+
+    .btn-cancel {
+      background: #f3f4f6;
+      color: #374151;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-cancel:hover { background: #e5e7eb; }
+
+    /* ---- METRICS INLINE ---- */
+    .metrics-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .metric-row {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr auto auto auto;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .metric-row input {
+      padding: 7px 10px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 6px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.8125rem;
+      color: #111827;
+      background: #f9fafb;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+
+    .metric-row input:focus {
+      border-color: #111827;
+      background: #fff;
+    }
+
+    .metric-row .order-input { width: 56px; text-align: center; }
+
+    .add-metric-btn {
+      margin-top: 8px;
+      background: #f9fafb;
+      border: 1.5px dashed #d1d5db;
+      border-radius: 10px;
+      padding: 12px;
+      width: 100%;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #9ca3af;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .add-metric-btn:hover {
+      background: #f3f4f6;
+      border-color: #9ca3af;
+      color: #374151;
+    }
+
+    /* ---- TOAST ---- */
+    .toast-container {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 999;
+    }
+
+    .toast {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      animation: slideIn 0.25s ease, fadeOut 0.4s ease 2.6s forwards;
+      pointer-events: none;
+    }
+
+    .toast.success { background: #065f46; }
+    .toast.error { background: #991b1b; }
+
+    @keyframes slideIn {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateY(-4px); }
+    }
+
+    /* ---- LOADING ---- */
+    .loading-row td {
+      padding: 32px !important;
+      text-align: center;
+      color: #9ca3af;
+    }
+
+    @media (max-width: 768px) {
+      .layout { flex-direction: column; }
+      .sidebar { width: 100%; flex-direction: row; padding: 0; }
+      .sidebar-label { display: none; }
+      .sidebar-nav { display: flex; flex-direction: row; overflow-x: auto; }
+      .sidebar-nav button { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+      .sidebar-nav button.active { border-bottom-color: #f9fafb; border-left-color: transparent; }
+      .content { padding: 20px 16px; }
+      .form-row { grid-template-columns: 1fr; }
+      .metric-row { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html">
+        <img src="https://vgbujcuwptvheqijyjbe.supabase.co/storage/v1/object/public/hmac-uploads/uploads/265bed1b-7a83-4b68-87a9-fbb24516aae4/1775401410958-85c79e2f/LOGO_EM_BRANCO_4x.png" alt="Brave" class="logo">
+      </a>
+      <span class="admin-badge">Painel Admin</span>
+    </div>
+    <button class="btn-signout" id="btn-signout">Sair</button>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <p class="sidebar-label">Conteúdo</p>
+      <nav class="sidebar-nav">
+        <button class="active" data-tab="projetos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Projetos
+        </button>
+        <button data-tab="time">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/></svg>
+          Time
+        </button>
+        <button data-tab="metricas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Métricas
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+
+      <!-- TAB: PROJETOS -->
+      <div class="tab-panel active" id="tab-projetos">
+        <div class="section-header">
+          <h2>Projetos</h2>
+          <button class="btn-primary" id="btn-new-project">+ Novo Projeto</button>
+        </div>
+        <div class="data-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Categoria</th>
+                <th>Ordem</th>
+                <th>Visível</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="projects-tbody">
+              <tr class="loading-row"><td colspan="5">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: TIME -->
+      <div class="tab-panel" id="tab-time">
+        <div class="section-header">
+          <h2>Time</h2>
+          <button class="btn-primary" id="btn-new-member">+ Novo Membro</button>
+        </div>
+        <div class="data-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Cargo</th>
+                <th>Ordem</th>
+                <th>Visível</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="team-tbody">
+              <tr class="loading-row"><td colspan="5">Carregando...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: MÉTRICAS -->
+      <div class="tab-panel" id="tab-metricas">
+        <div class="section-header">
+          <h2>Métricas</h2>
+        </div>
+        <div id="metrics-list" class="metrics-list"></div>
+        <button class="add-metric-btn" id="btn-add-metric">+ Adicionar Métrica</button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal: Projeto -->
+  <div class="modal-overlay" id="modal-project">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-project-title">Novo Projeto</h3>
+        <button class="modal-close" data-close="modal-project">&#x2715;</button>
+      </div>
+      <form id="project-form">
+        <input type="hidden" id="p-id">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p-title">Título *</label>
+            <input type="text" id="p-title" required>
+          </div>
+          <div class="form-group">
+            <label for="p-category">Categoria *</label>
+            <select id="p-category" required>
+              <option value="">Selecionar...</option>
+              <option value="Website">Website</option>
+              <option value="Sistema Web / Simulador">Sistema Web / Simulador</option>
+              <option value="Identidade Visual">Identidade Visual</option>
+              <option value="Web+ID">Web+ID</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group full">
+          <label for="p-description">Descrição curta</label>
+          <textarea id="p-description" rows="2"></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="p-image">Imagem</label>
+          <input type="file" id="p-image" accept="image/*">
+          <p class="upload-hint">Selecione um arquivo para fazer upload. Formatos: JPG, PNG, WEBP.</p>
+          <div class="img-preview" id="p-img-preview">
+            <img id="p-img-preview-img" src="" alt="Preview">
+          </div>
+          <input type="hidden" id="p-image-url">
+        </div>
+        <div class="form-group full">
+          <label for="p-live-url">URL ao vivo</label>
+          <input type="url" id="p-live-url" placeholder="https://...">
+        </div>
+        <div class="form-group full">
+          <label for="p-challenge">Desafio</label>
+          <textarea id="p-challenge" rows="3"></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="p-solution">Solução</label>
+          <textarea id="p-solution" rows="3"></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="p-result">Resultado</label>
+          <textarea id="p-result" rows="2"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="p-order">Ordem</label>
+            <input type="number" id="p-order" value="0" min="0">
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:2px;">
+            <label class="checkbox-row">
+              <input type="checkbox" id="p-visible" checked>
+              Visível no portfólio
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" data-close="modal-project">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-save-project">Salvar Projeto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Membro do Time -->
+  <div class="modal-overlay" id="modal-member">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-member-title">Novo Membro</h3>
+        <button class="modal-close" data-close="modal-member">&#x2715;</button>
+      </div>
+      <form id="member-form">
+        <input type="hidden" id="m-id">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="m-name">Nome *</label>
+            <input type="text" id="m-name" required>
+          </div>
+          <div class="form-group">
+            <label for="m-role">Cargo</label>
+            <input type="text" id="m-role">
+          </div>
+        </div>
+        <div class="form-group full">
+          <label for="m-photo">Foto</label>
+          <input type="file" id="m-photo" accept="image/*">
+          <p class="upload-hint">Selecione uma foto. Formatos: JPG, PNG, WEBP.</p>
+          <div class="img-preview" id="m-photo-preview">
+            <img id="m-photo-preview-img" src="" alt="Preview">
+          </div>
+          <input type="hidden" id="m-photo-url">
+        </div>
+        <div class="form-group full">
+          <label for="m-description">Descrição</label>
+          <textarea id="m-description" rows="3"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="m-order">Ordem</label>
+            <input type="number" id="m-order" value="0" min="0">
+          </div>
+          <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:2px;">
+            <label class="checkbox-row">
+              <input type="checkbox" id="m-visible" checked>
+              Visível no site
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" data-close="modal-member">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-save-member">Salvar Membro</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const { createClient } = supabase;
+    const sb = createClient(
+      'https://momopryksxaenfwhzrcn.supabase.co',
+      'sb_publishable_0R07eDLCRMSn5BUFmFstxQ_Nybv7qMe'
+    );
+
+    // ---- AUTH GUARD ----
+    (async function guardAuth() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) window.location.href = 'index.html';
+    })();
+
+    document.getElementById('btn-signout').addEventListener('click', async () => {
+      await sb.auth.signOut();
+      window.location.href = 'index.html';
+    });
+
+    // ---- TOAST ----
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3200);
+    }
+
+    // ---- TABS ----
+    document.querySelectorAll('.sidebar-nav button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+
+        if (btn.dataset.tab === 'projetos') loadProjects();
+        if (btn.dataset.tab === 'time') loadTeam();
+        if (btn.dataset.tab === 'metricas') loadMetrics();
+      });
+    });
+
+    // ---- MODAL HELPERS ----
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    document.querySelectorAll('[data-close]').forEach(el => {
+      el.addEventListener('click', () => closeModal(el.dataset.close));
+    });
+
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModal(overlay.id);
+      });
+    });
+
+    // ---- IMAGE UPLOAD HELPER ----
+    async function uploadImage(file, bucket) {
+      const ext = file.name.split('.').pop();
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await sb.storage.from(bucket).upload(path, file, { upsert: false });
+      if (error) throw error;
+      const { data } = sb.storage.from(bucket).getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    // ---- TOGGLE VISIBLE CELL ----
+    function createToggle(id, checked, onChangeHandler) {
+      const label = document.createElement('label');
+      label.className = 'toggle';
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.checked = checked;
+      input.addEventListener('change', () => onChangeHandler(id, input.checked));
+      const track = document.createElement('span');
+      track.className = 'toggle-track';
+      label.appendChild(input);
+      label.appendChild(track);
+      return label;
+    }
+
+    // ==================================================
+    // PROJECTS
+    // ==================================================
+
+    async function loadProjects() {
+      const tbody = document.getElementById('projects-tbody');
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Carregando...</td></tr>';
+
+      const { data, error } = await sb
+        .from('portfolio_projects')
+        .select('id, title, category, sort_order, visible')
+        .order('sort_order', { ascending: true });
+
+      if (error) {
+        tbody.innerHTML = `<tr><td colspan="5" style="padding:24px;color:#dc2626;">Erro: ${error.message}</td></tr>`;
+        return;
+      }
+
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum projeto encontrado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      data.forEach(project => {
+        const tr = document.createElement('tr');
+
+        const tdTitle = document.createElement('td');
+        tdTitle.textContent = project.title;
+        tdTitle.style.fontWeight = '600';
+
+        const tdCategory = document.createElement('td');
+        tdCategory.textContent = project.category;
+
+        const tdOrder = document.createElement('td');
+        tdOrder.textContent = project.sort_order;
+
+        const tdVisible = document.createElement('td');
+        tdVisible.appendChild(createToggle(project.id, project.visible, async (id, val) => {
+          const { error } = await sb.from('portfolio_projects').update({ visible: val }).eq('id', id);
+          if (error) showToast('Erro ao atualizar.', 'error');
+          else showToast('Visibilidade atualizada.');
+        }));
+
+        const tdActions = document.createElement('td');
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'td-actions';
+
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn-sm btn-edit';
+        btnEdit.textContent = 'Editar';
+        btnEdit.addEventListener('click', () => openProjectModal(project.id));
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn-sm btn-delete';
+        btnDelete.textContent = 'Excluir';
+        btnDelete.addEventListener('click', () => deleteProject(project.id, project.title));
+
+        actionsDiv.appendChild(btnEdit);
+        actionsDiv.appendChild(btnDelete);
+        tdActions.appendChild(actionsDiv);
+
+        tr.appendChild(tdTitle);
+        tr.appendChild(tdCategory);
+        tr.appendChild(tdOrder);
+        tr.appendChild(tdVisible);
+        tr.appendChild(tdActions);
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function openProjectModal(id = null) {
+      const form = document.getElementById('project-form');
+      form.reset();
+      document.getElementById('p-id').value = '';
+      document.getElementById('p-visible').checked = true;
+      document.getElementById('p-image-url').value = '';
+      document.getElementById('p-img-preview').classList.remove('visible');
+      document.getElementById('modal-project-title').textContent = id ? 'Editar Projeto' : 'Novo Projeto';
+
+      if (id) {
+        const { data } = await sb.from('portfolio_projects').select('*').eq('id', id).single();
+        if (data) {
+          document.getElementById('p-id').value = data.id;
+          document.getElementById('p-title').value = data.title || '';
+          document.getElementById('p-category').value = data.category || '';
+          document.getElementById('p-description').value = data.description || '';
+          document.getElementById('p-image-url').value = data.image_url || '';
+          document.getElementById('p-live-url').value = data.live_url || '';
+          document.getElementById('p-challenge').value = data.challenge || '';
+          document.getElementById('p-solution').value = data.solution || '';
+          document.getElementById('p-result').value = data.result || '';
+          document.getElementById('p-order').value = data.sort_order || 0;
+          document.getElementById('p-visible').checked = data.visible !== false;
+
+          if (data.image_url) {
+            const preview = document.getElementById('p-img-preview');
+            document.getElementById('p-img-preview-img').src = data.image_url;
+            preview.classList.add('visible');
+          }
+        }
+      }
+
+      openModal('modal-project');
+    }
+
+    document.getElementById('p-image').addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const preview = document.getElementById('p-img-preview');
+        document.getElementById('p-img-preview-img').src = e.target.result;
+        preview.classList.add('visible');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('btn-new-project').addEventListener('click', () => openProjectModal());
+
+    document.getElementById('project-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-project');
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+
+      try {
+        let imageUrl = document.getElementById('p-image-url').value;
+        const fileInput = document.getElementById('p-image');
+
+        if (fileInput.files.length > 0) {
+          imageUrl = await uploadImage(fileInput.files[0], 'portfolio-images');
+        }
+
+        const payload = {
+          title: document.getElementById('p-title').value.trim(),
+          category: document.getElementById('p-category').value,
+          description: document.getElementById('p-description').value.trim(),
+          image_url: imageUrl,
+          live_url: document.getElementById('p-live-url').value.trim(),
+          challenge: document.getElementById('p-challenge').value.trim(),
+          solution: document.getElementById('p-solution').value.trim(),
+          result: document.getElementById('p-result').value.trim(),
+          sort_order: parseInt(document.getElementById('p-order').value) || 0,
+          visible: document.getElementById('p-visible').checked,
+        };
+
+        const id = document.getElementById('p-id').value;
+
+        if (id) {
+          const { error } = await sb.from('portfolio_projects').update(payload).eq('id', id);
+          if (error) throw error;
+        } else {
+          const { error } = await sb.from('portfolio_projects').insert(payload);
+          if (error) throw error;
+        }
+
+        closeModal('modal-project');
+        showToast(id ? 'Projeto atualizado.' : 'Projeto criado.');
+        loadProjects();
+      } catch (err) {
+        showToast('Erro ao salvar: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Salvar Projeto';
+      }
+    });
+
+    async function deleteProject(id, title) {
+      if (!confirm(`Excluir o projeto "${title}"? Esta ação não pode ser desfeita.`)) return;
+      const { error } = await sb.from('portfolio_projects').delete().eq('id', id);
+      if (error) showToast('Erro ao excluir: ' + error.message, 'error');
+      else { showToast('Projeto excluído.'); loadProjects(); }
+    }
+
+    // ==================================================
+    // TEAM
+    // ==================================================
+
+    async function loadTeam() {
+      const tbody = document.getElementById('team-tbody');
+      tbody.innerHTML = '<tr class="loading-row"><td colspan="5">Carregando...</td></tr>';
+
+      const { data, error } = await sb
+        .from('team_members')
+        .select('id, name, role, sort_order, visible')
+        .order('sort_order', { ascending: true });
+
+      if (error) {
+        tbody.innerHTML = `<tr><td colspan="5" style="padding:24px;color:#dc2626;">Erro: ${error.message}</td></tr>`;
+        return;
+      }
+
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum membro encontrado.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      data.forEach(member => {
+        const tr = document.createElement('tr');
+
+        const tdName = document.createElement('td');
+        tdName.textContent = member.name;
+        tdName.style.fontWeight = '600';
+
+        const tdRole = document.createElement('td');
+        tdRole.textContent = member.role || '—';
+
+        const tdOrder = document.createElement('td');
+        tdOrder.textContent = member.sort_order;
+
+        const tdVisible = document.createElement('td');
+        tdVisible.appendChild(createToggle(member.id, member.visible, async (id, val) => {
+          const { error } = await sb.from('team_members').update({ visible: val }).eq('id', id);
+          if (error) showToast('Erro ao atualizar.', 'error');
+          else showToast('Visibilidade atualizada.');
+        }));
+
+        const tdActions = document.createElement('td');
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'td-actions';
+
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn-sm btn-edit';
+        btnEdit.textContent = 'Editar';
+        btnEdit.addEventListener('click', () => openMemberModal(member.id));
+
+        const btnDelete = document.createElement('button');
+        btnDelete.className = 'btn-sm btn-delete';
+        btnDelete.textContent = 'Excluir';
+        btnDelete.addEventListener('click', () => deleteMember(member.id, member.name));
+
+        actionsDiv.appendChild(btnEdit);
+        actionsDiv.appendChild(btnDelete);
+        tdActions.appendChild(actionsDiv);
+
+        tr.appendChild(tdName);
+        tr.appendChild(tdRole);
+        tr.appendChild(tdOrder);
+        tr.appendChild(tdVisible);
+        tr.appendChild(tdActions);
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function openMemberModal(id = null) {
+      const form = document.getElementById('member-form');
+      form.reset();
+      document.getElementById('m-id').value = '';
+      document.getElementById('m-visible').checked = true;
+      document.getElementById('m-photo-url').value = '';
+      document.getElementById('m-photo-preview').classList.remove('visible');
+      document.getElementById('modal-member-title').textContent = id ? 'Editar Membro' : 'Novo Membro';
+
+      if (id) {
+        const { data } = await sb.from('team_members').select('*').eq('id', id).single();
+        if (data) {
+          document.getElementById('m-id').value = data.id;
+          document.getElementById('m-name').value = data.name || '';
+          document.getElementById('m-role').value = data.role || '';
+          document.getElementById('m-photo-url').value = data.photo_url || '';
+          document.getElementById('m-description').value = data.description || '';
+          document.getElementById('m-order').value = data.sort_order || 0;
+          document.getElementById('m-visible').checked = data.visible !== false;
+
+          if (data.photo_url) {
+            const preview = document.getElementById('m-photo-preview');
+            document.getElementById('m-photo-preview-img').src = data.photo_url;
+            preview.classList.add('visible');
+          }
+        }
+      }
+
+      openModal('modal-member');
+    }
+
+    document.getElementById('m-photo').addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const preview = document.getElementById('m-photo-preview');
+        document.getElementById('m-photo-preview-img').src = e.target.result;
+        preview.classList.add('visible');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById('btn-new-member').addEventListener('click', () => openMemberModal());
+
+    document.getElementById('member-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-save-member');
+      btn.disabled = true;
+      btn.textContent = 'Salvando...';
+
+      try {
+        let photoUrl = document.getElementById('m-photo-url').value;
+        const fileInput = document.getElementById('m-photo');
+
+        if (fileInput.files.length > 0) {
+          photoUrl = await uploadImage(fileInput.files[0], 'team-photos');
+        }
+
+        const payload = {
+          name: document.getElementById('m-name').value.trim(),
+          role: document.getElementById('m-role').value.trim(),
+          photo_url: photoUrl,
+          description: document.getElementById('m-description').value.trim(),
+          sort_order: parseInt(document.getElementById('m-order').value) || 0,
+          visible: document.getElementById('m-visible').checked,
+        };
+
+        const id = document.getElementById('m-id').value;
+
+        if (id) {
+          const { error } = await sb.from('team_members').update(payload).eq('id', id);
+          if (error) throw error;
+        } else {
+          const { error } = await sb.from('team_members').insert(payload);
+          if (error) throw error;
+        }
+
+        closeModal('modal-member');
+        showToast(id ? 'Membro atualizado.' : 'Membro adicionado.');
+        loadTeam();
+      } catch (err) {
+        showToast('Erro ao salvar: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Salvar Membro';
+      }
+    });
+
+    async function deleteMember(id, name) {
+      if (!confirm(`Excluir o membro "${name}"?`)) return;
+      const { error } = await sb.from('team_members').delete().eq('id', id);
+      if (error) showToast('Erro ao excluir: ' + error.message, 'error');
+      else { showToast('Membro excluído.'); loadTeam(); }
+    }
+
+    // ==================================================
+    // METRICS
+    // ==================================================
+
+    let metricsData = [];
+
+    async function loadMetrics() {
+      const container = document.getElementById('metrics-list');
+      container.innerHTML = '<p style="padding:16px;color:#9ca3af;font-size:0.875rem;">Carregando...</p>';
+
+      const { data, error } = await sb
+        .from('metrics')
+        .select('*')
+        .order('sort_order', { ascending: true });
+
+      if (error) {
+        container.innerHTML = `<p style="color:#dc2626;font-size:0.875rem;">${error.message}</p>`;
+        return;
+      }
+
+      metricsData = data || [];
+      renderMetrics();
+    }
+
+    function renderMetrics() {
+      const container = document.getElementById('metrics-list');
+      container.innerHTML = '';
+
+      metricsData.forEach((metric, index) => {
+        container.appendChild(buildMetricRow(metric, index));
+      });
+    }
+
+    function buildMetricRow(metric, index) {
+      const row = document.createElement('div');
+      row.className = 'metric-row';
+      row.dataset.id = metric.id || '';
+      row.dataset.index = index;
+
+      const labelInput = document.createElement('input');
+      labelInput.type = 'text';
+      labelInput.placeholder = 'Label (ex: Clientes)';
+      labelInput.value = metric.label || '';
+
+      const valueInput = document.createElement('input');
+      valueInput.type = 'text';
+      valueInput.placeholder = 'Valor (ex: 1000+)';
+      valueInput.value = metric.value || '';
+
+      const orderInput = document.createElement('input');
+      orderInput.type = 'number';
+      orderInput.className = 'order-input';
+      orderInput.placeholder = '0';
+      orderInput.value = metric.sort_order || 0;
+      orderInput.min = 0;
+
+      const btnSave = document.createElement('button');
+      btnSave.className = 'btn-sm btn-save-inline';
+      btnSave.textContent = 'Salvar';
+      btnSave.addEventListener('click', () => saveMetric(row, metric.id, labelInput, valueInput, orderInput));
+
+      const btnDelete = document.createElement('button');
+      btnDelete.className = 'btn-sm btn-delete';
+      btnDelete.textContent = 'Excluir';
+      btnDelete.addEventListener('click', () => deleteMetric(metric.id, row));
+
+      row.appendChild(labelInput);
+      row.appendChild(valueInput);
+      row.appendChild(orderInput);
+      row.appendChild(btnSave);
+      row.appendChild(btnDelete);
+
+      return row;
+    }
+
+    async function saveMetric(row, id, labelInput, valueInput, orderInput) {
+      const payload = {
+        label: labelInput.value.trim(),
+        value: valueInput.value.trim(),
+        sort_order: parseInt(orderInput.value) || 0,
+      };
+
+      if (!payload.label || !payload.value) {
+        showToast('Label e valor são obrigatórios.', 'error');
+        return;
+      }
+
+      if (id) {
+        const { error } = await sb.from('metrics').update(payload).eq('id', id);
+        if (error) { showToast('Erro: ' + error.message, 'error'); return; }
+      } else {
+        const { data, error } = await sb.from('metrics').insert(payload).select().single();
+        if (error) { showToast('Erro: ' + error.message, 'error'); return; }
+        row.dataset.id = data.id;
+      }
+
+      showToast('Métrica salva.');
+    }
+
+    async function deleteMetric(id, row) {
+      if (!confirm('Excluir esta métrica?')) return;
+
+      if (id) {
+        const { error } = await sb.from('metrics').delete().eq('id', id);
+        if (error) { showToast('Erro: ' + error.message, 'error'); return; }
+      }
+
+      row.remove();
+      showToast('Métrica excluída.');
+    }
+
+    document.getElementById('btn-add-metric').addEventListener('click', () => {
+      const newMetric = { id: null, label: '', value: '', sort_order: 0 };
+      metricsData.push(newMetric);
+      const container = document.getElementById('metrics-list');
+      const row = buildMetricRow(newMetric, metricsData.length - 1);
+      container.appendChild(row);
+      row.querySelector('input').focus();
+    });
+
+    // ---- INITIAL LOAD ----
+    loadProjects();
+  </script>
+</body>
+</html>
