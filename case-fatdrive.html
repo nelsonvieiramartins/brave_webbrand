@@ -592,26 +592,29 @@
       if (!viewport || !img) return;
 
       const PAUSE_TOP    = 1200;
-      const SCROLL_DOWN  = 22000;
       const PAUSE_BOTTOM = 1800;
-      const SCROLL_UP    = 10000;
+      const PX_PER_SEC_DOWN = 90;   // velocidade padrão de descida (px/s)
+      const PX_PER_SEC_UP   = 180;  // subida 2× mais rápida
 
       function startScroll() {
         const dist = Math.max(0, img.offsetHeight - viewport.offsetHeight);
-        if (dist < 10) return; // image fits, no scroll needed
+        if (dist < 10) return;
+
+        const scrollDown = Math.round(dist / PX_PER_SEC_DOWN * 1000);
+        const scrollUp   = Math.round(dist / PX_PER_SEC_UP   * 1000);
 
         img.style.transition = 'none';
         img.style.transform = 'translateY(0)';
 
         setTimeout(() => {
-          img.style.transition = `transform ${SCROLL_DOWN}ms cubic-bezier(0.4, 0, 0.6, 1)`;
+          img.style.transition = `transform ${scrollDown}ms cubic-bezier(0.4, 0, 0.6, 1)`;
           img.style.transform = `translateY(-${dist}px)`;
 
           setTimeout(() => {
-            img.style.transition = `transform ${SCROLL_UP}ms cubic-bezier(0.4, 0, 0.6, 1)`;
+            img.style.transition = `transform ${scrollUp}ms cubic-bezier(0.4, 0, 0.6, 1)`;
             img.style.transform = 'translateY(0)';
-            setTimeout(startScroll, SCROLL_UP + PAUSE_TOP);
-          }, SCROLL_DOWN + PAUSE_BOTTOM);
+            setTimeout(startScroll, scrollUp + PAUSE_TOP);
+          }, scrollDown + PAUSE_BOTTOM);
         }, PAUSE_TOP);
       }
 
