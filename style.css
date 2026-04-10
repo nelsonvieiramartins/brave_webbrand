@@ -1290,6 +1290,16 @@ img {
   .cols-4 { grid-template-columns: repeat(4, 1fr); }
 }
 
+.cols-3-wrap {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .cols-3-wrap { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1200px) {
+  .cols-3-wrap { grid-template-columns: repeat(3, 1fr); }
+}
+
 .vertical-card {
   background: #f9fafb;
   border: 1px solid var(--color-gray-100);
