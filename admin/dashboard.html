@@ -153,6 +153,43 @@
     .img-preview.visible { display: block; }
     .img-preview img { width: 100%; max-height: 180px; object-fit: cover; }
 
+    .gallery-add-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #111827; color: #f9fafb;
+      font-family: 'Poppins', sans-serif; font-size: 0.8125rem; font-weight: 600;
+      padding: 10px 20px; border-radius: 8px; cursor: pointer;
+      margin-bottom: 16px; transition: background 0.2s;
+    }
+    .gallery-add-btn:hover { background: #1f2937; }
+    .gallery-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+    }
+    .gallery-thumb {
+      position: relative; aspect-ratio: 1; border-radius: 8px;
+      overflow: hidden; background: #e5e7eb;
+    }
+    .gallery-thumb img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .gallery-thumb-remove {
+      position: absolute; top: 6px; right: 6px;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(0,0,0,0.65); border: none; cursor: pointer;
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-size: 14px; line-height: 1; transition: background 0.2s;
+    }
+    .gallery-thumb-remove:hover { background: #ef4444; }
+    .gallery-thumb-uploading::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(0,0,0,0.45);
+    }
+    .gallery-thumb-uploading .gallery-spinner {
+      position: absolute; inset: 0; display: flex;
+      align-items: center; justify-content: center; z-index: 2;
+      color: #fff; font-size: 11px; font-weight: 600;
+    }
+
     .form-divider {
       grid-column: 1 / -1; border: none;
       border-top: 1px solid #f3f4f6; margin: 8px 0;
@@ -369,6 +406,7 @@
                     <option value="Sistema Web / Simulador">Sistema Web / Simulador</option>
                     <option value="Identidade Visual">Identidade Visual</option>
                     <option value="Web+ID">Web+ID</option>
+                    <option value="Fotografia">Fotografia</option>
                     <option value="Outro">Outro</option>
                   </select>
                 </div>
@@ -388,7 +426,8 @@
                   <input type="hidden" id="p-image-url">
                 </div>
 
-                <div class="form-group span-2">
+                <!-- O Projeto — single screenshot (non-Fotografia) -->
+                <div class="form-group span-2" id="field-project-image">
                   <label for="p-project-image">O Projeto <span style="font-weight:400;color:#9ca3af;">(screenshot completo para o case study)</span></label>
                   <input type="file" id="p-project-image" accept="image/*">
                   <p class="upload-hint">Screenshot longa do site — será exibida com animação de scroll automático na página do case. JPG ou PNG.</p>
@@ -396,6 +435,19 @@
                     <img id="p-project-img-preview-img" src="" alt="Preview">
                   </div>
                   <input type="hidden" id="p-project-image-url">
+                </div>
+
+                <!-- Galeria de Fotos — apenas Fotografia -->
+                <div class="form-group span-2" id="field-gallery" style="display:none;">
+                  <label>Galeria de Fotos</label>
+                  <p class="upload-hint" style="margin-bottom:12px;">Adicione quantas fotos quiser. Serão exibidas em grade na página do case.</p>
+                  <label class="gallery-add-btn" for="p-gallery-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Adicionar fotos
+                    <input type="file" id="p-gallery-input" accept="image/*" multiple style="display:none;">
+                  </label>
+                  <div class="gallery-grid" id="gallery-grid"></div>
+                  <input type="hidden" id="p-gallery-urls" value="[]">
                 </div>
 
                 <div class="form-group span-2">
@@ -670,7 +722,11 @@
       document.getElementById('p-img-preview').classList.remove('visible');
       document.getElementById('p-project-image-url').value = '';
       document.getElementById('p-project-img-preview').classList.remove('visible');
+      galleryItems = [];
+      document.getElementById('gallery-grid').innerHTML = '';
+      document.getElementById('p-gallery-urls').value = '[]';
       document.getElementById('project-panel-title').textContent = id ? 'Editar Projeto' : 'Novo Projeto';
+      updateCategoryFields();
 
       if (id) {
         const { data } = await sb.from('portfolio_projects').select('*').eq('id', id).single();
@@ -695,9 +751,78 @@
             document.getElementById('p-project-img-preview-img').src = data.project_image_url;
             document.getElementById('p-project-img-preview').classList.add('visible');
           }
+          if (data.gallery_images && data.gallery_images.length) {
+            loadGalleryFromUrls(data.gallery_images);
+          }
+          updateCategoryFields();
         }
       }
       showEditPanel('projects-list-view', 'project-edit-panel');
+    }
+
+    // ── Category toggle: single image vs gallery ──
+    function updateCategoryFields() {
+      const cat = document.getElementById('p-category').value;
+      const isPhoto = cat === 'Fotografia';
+      document.getElementById('field-project-image').style.display = isPhoto ? 'none' : '';
+      document.getElementById('field-gallery').style.display = isPhoto ? '' : 'none';
+    }
+    document.getElementById('p-category').addEventListener('change', updateCategoryFields);
+
+    // ── Gallery state ──
+    let galleryItems = []; // { url: string, file: File|null, thumb: Element }
+
+    function renderGalleryItem(url, file = null) {
+      const wrap = document.createElement('div');
+      wrap.className = 'gallery-thumb';
+      wrap.innerHTML = `<img src="${url}"><button type="button" class="gallery-thumb-remove" title="Remover">✕</button>`;
+      wrap.querySelector('.gallery-thumb-remove').addEventListener('click', () => {
+        galleryItems = galleryItems.filter(i => i.thumb !== wrap);
+        wrap.remove();
+        syncGalleryUrls();
+      });
+      document.getElementById('gallery-grid').appendChild(wrap);
+      return wrap;
+    }
+
+    function syncGalleryUrls() {
+      const urls = galleryItems.filter(i => i.url).map(i => i.url);
+      document.getElementById('p-gallery-urls').value = JSON.stringify(urls);
+    }
+
+    function loadGalleryFromUrls(urls) {
+      galleryItems = [];
+      document.getElementById('gallery-grid').innerHTML = '';
+      (urls || []).forEach(url => {
+        const thumb = renderGalleryItem(url);
+        galleryItems.push({ url, file: null, thumb });
+      });
+      syncGalleryUrls();
+    }
+
+    document.getElementById('p-gallery-input').addEventListener('change', function () {
+      Array.from(this.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const thumb = renderGalleryItem(e.target.result, file);
+          galleryItems.push({ url: null, file, thumb, previewUrl: e.target.result });
+        };
+        reader.readAsDataURL(file);
+      });
+      this.value = '';
+    });
+
+    async function uploadGalleryImages() {
+      for (const item of galleryItems) {
+        if (item.file && !item.url) {
+          item.thumb.classList.add('gallery-thumb-uploading');
+          item.thumb.innerHTML += '<div class="gallery-spinner">Enviando...</div>';
+          item.url = await uploadImage(item.file, 'portfolio-images');
+          item.thumb.classList.remove('gallery-thumb-uploading');
+          item.thumb.querySelector('.gallery-spinner')?.remove();
+        }
+      }
+      syncGalleryUrls();
     }
 
     document.getElementById('p-image').addEventListener('change', function () {
@@ -739,12 +864,20 @@
         const projectFileInput = document.getElementById('p-project-image');
         if (projectFileInput.files.length > 0) projectImageUrl = await uploadImage(projectFileInput.files[0], 'portfolio-images');
 
+        const category = document.getElementById('p-category').value;
+        let galleryUrls = [];
+        if (category === 'Fotografia') {
+          await uploadGalleryImages();
+          galleryUrls = galleryItems.map(i => i.url).filter(Boolean);
+        }
+
         const payload = {
           title: document.getElementById('p-title').value.trim(),
-          category: document.getElementById('p-category').value,
+          category,
           description: document.getElementById('p-description').value.trim(),
           image_url: imageUrl,
-          project_image_url: projectImageUrl,
+          project_image_url: category === 'Fotografia' ? null : projectImageUrl,
+          gallery_images: category === 'Fotografia' ? galleryUrls : [],
           live_url: document.getElementById('p-live-url').value.trim(),
           challenge: document.getElementById('p-challenge').value.trim(),
           solution: document.getElementById('p-solution').value.trim(),
