@@ -1566,6 +1566,8 @@ img {
   height: 48px;
   border-radius: 50%;
   border: 2px solid rgba(255, 255, 255, 0.1);
+  object-fit: cover;
+  object-position: center 20%;
 }
 
 .profile-name { font-weight: 700; }
