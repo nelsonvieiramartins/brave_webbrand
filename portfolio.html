@@ -159,7 +159,10 @@
       let allCards = [];
 
       function buildCard(project, index) {
-        const href = CASE_LINKS[project.title] || '#';
+        const isPhoto = (project.category || '').toLowerCase() === 'fotografia';
+        const href = isPhoto
+          ? `case-foto.html?id=${project.id}`
+          : (CASE_LINKS[project.title] || '#');
         const delay = delays[index % delays.length];
 
         const a = document.createElement('a');
@@ -214,7 +217,7 @@
 
         const { data, error } = await sb
           .from('portfolio_projects')
-          .select('title, category, description, image_url')
+          .select('id, title, category, description, image_url')
           .eq('visible', true)
           .order('sort_order', { ascending: true });
 
