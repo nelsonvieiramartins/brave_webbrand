@@ -71,6 +71,13 @@
         </div>
       </section>
 
+      <!-- METRICS BAR -->
+      <section class="metrics-bar">
+        <div class="container metrics-bar__inner" id="metrics-bar-inner">
+          <!-- preenchido via JS -->
+        </div>
+      </section>
+
       <!-- DUALITY SECTION -->
       <section class="duality">
         <div class="container">
@@ -231,6 +238,29 @@
     </footer>
   </div>
   <script src="main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+  (function () {
+    const { createClient } = supabase;
+    const sb = createClient(
+      'https://momopryksxaenfwhzrcn.supabase.co',
+      'sb_publishable_0R07eDLCRMSn5BUFmFstxQ_Nybv7qMe'
+    );
+    async function loadMetrics() {
+      const bar = document.getElementById('metrics-bar-inner');
+      if (!bar) return;
+      const { data } = await sb.from('metrics').select('label, value').order('sort_order', { ascending: true });
+      if (!data || !data.length) return;
+      bar.innerHTML = data.map(m => `
+        <div class="metric-item reveal-up">
+          <span class="metric-value">${m.value}</span>
+          <span class="metric-label">${m.label}</span>
+        </div>
+      `).join('');
+    }
+    loadMetrics();
+  })();
+  </script>
   <script>
   (function () {
     const slides = Array.from(document.querySelectorAll('#screen-slider .screen-slide'));
