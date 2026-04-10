@@ -52,11 +52,12 @@
 
           <!-- Filters -->
           <div class="portfolio-filters reveal-up" style="animation-delay: 200ms;">
-            <button class="filter-btn active">Todos</button>
-            <button class="filter-btn">Websites</button>
-            <button class="filter-btn">Sistemas / Simuladores</button>
-            <button class="filter-btn">Identidade Visual</button>
-            <button class="filter-btn">Projetos Completos (Web+ID)</button>
+            <button class="filter-btn active" data-filter="todos">Todos</button>
+            <button class="filter-btn" data-filter="websites">Websites</button>
+            <button class="filter-btn" data-filter="sistemas">Sistemas / Simuladores</button>
+            <button class="filter-btn" data-filter="identidade">Identidade Visual</button>
+            <button class="filter-btn" data-filter="projetos">Projetos Completos (Web+ID)</button>
+            <button class="filter-btn" data-filter="fotografia">Fotografia</button>
           </div>
         </div>
       </section>
@@ -144,7 +145,18 @@
         'Odontologia Pelegrino': 'case-odontologia.html',
       };
 
+      // Maps filter key → category substrings to match (lowercase)
+      const FILTER_MAP = {
+        'todos': null,
+        'websites': ['site institucional', 'website', 'websites'],
+        'sistemas': ['sistema', 'simulador'],
+        'identidade': ['identidade visual', 'branding'],
+        'projetos': ['web+id', 'projeto completo'],
+        'fotografia': ['fotografia'],
+      };
+
       const delays = ['0ms', '100ms', '200ms'];
+      let allCards = [];
 
       function buildCard(project, index) {
         const href = CASE_LINKS[project.title] || '#';
@@ -153,6 +165,7 @@
         const a = document.createElement('a');
         a.href = href;
         a.className = 'project-card reveal-up';
+        a.dataset.category = (project.category || '').toLowerCase();
         if (delay !== '0ms') a.style.animationDelay = delay;
 
         a.innerHTML = `
@@ -170,6 +183,31 @@
         return a;
       }
 
+      function applyFilter(filterKey) {
+        const keywords = FILTER_MAP[filterKey];
+        const empty = document.getElementById('portfolio-empty');
+        let visible = 0;
+
+        allCards.forEach(card => {
+          const cat = card.dataset.category;
+          const show = !keywords || keywords.some(kw => cat.includes(kw));
+          card.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+
+        empty.style.display = visible === 0 ? 'block' : 'none';
+      }
+
+      function initFilters() {
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilter(btn.dataset.filter);
+          });
+        });
+      }
+
       async function loadProjects() {
         const grid = document.getElementById('projects-grid');
         const empty = document.getElementById('portfolio-empty');
@@ -185,7 +223,13 @@
           return;
         }
 
-        data.forEach((project, i) => grid.appendChild(buildCard(project, i)));
+        data.forEach((project, i) => {
+          const card = buildCard(project, i);
+          allCards.push(card);
+          grid.appendChild(card);
+        });
+
+        initFilters();
       }
 
       loadProjects();
