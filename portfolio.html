@@ -166,7 +166,7 @@
           ? `case-foto.html?id=${project.id}`
           : isBrand
             ? `case-identidade.html?id=${project.id}`
-            : (CASE_LINKS[project.title] || '#');
+            : `case-projeto.html?id=${project.id}`;
         const delay = delays[index % delays.length];
 
         const a = document.createElement('a');
