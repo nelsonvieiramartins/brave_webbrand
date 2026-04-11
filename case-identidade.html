@@ -483,8 +483,9 @@
         // Live URL
         if (data.live_url) {
           const link = document.getElementById('live-link');
-          link.href = data.live_url;
-          document.getElementById('live-link-text').textContent = data.live_url.replace(/^https?:\/\//, '');
+          const url = /^https?:\/\//i.test(data.live_url) ? data.live_url : 'https://' + data.live_url;
+          link.href = url;
+          document.getElementById('live-link-text').textContent = data.live_url.replace(/^https?:\/\//i, '');
           document.getElementById('section-live').style.display = '';
         }
 
