@@ -494,7 +494,12 @@
                   <input type="hidden" id="p-brand-gallery-data" value="[]">
                 </div>
 
-                <div class="form-group span-2">
+                <div class="form-group">
+                  <label for="p-year">Ano do projeto</label>
+                  <input type="number" id="p-year" placeholder="Ex: 2025" min="2000" max="2099">
+                </div>
+
+                <div class="form-group">
                   <label for="p-live-url">URL ao vivo</label>
                   <input type="url" id="p-live-url" placeholder="https://...">
                 </div>
@@ -783,6 +788,7 @@
           document.getElementById('p-category').value = data.category || '';
           document.getElementById('p-description').value = data.description || '';
           document.getElementById('p-image-url').value = data.image_url || '';
+          document.getElementById('p-year').value = data.project_year || '';
           document.getElementById('p-live-url').value = data.live_url || '';
           document.getElementById('p-challenge').value = data.challenge || '';
           document.getElementById('p-solution').value = data.solution || '';
@@ -1007,6 +1013,7 @@
           project_image_url: (category === 'Fotografia' || category === 'Identidade Visual') ? null : projectImageUrl,
           gallery_images: category === 'Fotografia' ? galleryUrls : [],
           brand_gallery: category === 'Identidade Visual' ? brandGalleryData : [],
+          project_year: parseInt(document.getElementById('p-year').value) || null,
           live_url: document.getElementById('p-live-url').value.trim(),
           challenge: document.getElementById('p-challenge').value.trim(),
           solution: document.getElementById('p-solution').value.trim(),

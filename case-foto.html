@@ -358,7 +358,7 @@
         // Hero
         if (data.image_url) document.getElementById('hero-img').src = data.image_url;
         document.getElementById('hero-title').textContent = data.title;
-        const year = data.created_at ? new Date(data.created_at).getFullYear() : '2025';
+        const year = data.project_year || (data.created_at ? new Date(data.created_at).getFullYear() : '2025');
         document.getElementById('hero-year').textContent = year;
 
         // Meta
