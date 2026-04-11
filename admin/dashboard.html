@@ -190,6 +190,37 @@
       color: #fff; font-size: 11px; font-weight: 600;
     }
 
+    /* Brand Gallery (Identidade Visual) */
+    .brand-gallery-list { display: flex; flex-direction: column; gap: 12px; }
+    .brand-gallery-item {
+      display: flex; align-items: center; gap: 12px;
+      background: #f9fafb; border: 1px solid #e5e7eb;
+      border-radius: 10px; padding: 10px 12px;
+    }
+    .brand-gallery-item img {
+      width: 72px; height: 56px; object-fit: cover;
+      border-radius: 6px; flex-shrink: 0; background: #e5e7eb;
+    }
+    .brand-gallery-item img.placeholder {
+      display: flex; align-items: center; justify-content: center;
+      color: #9ca3af; font-size: 11px;
+    }
+    .brand-gallery-item input[type="text"] {
+      flex: 1; border: 1px solid #d1d5db; border-radius: 6px;
+      padding: 7px 10px; font-family: 'Poppins', sans-serif;
+      font-size: 0.8125rem; color: #111827; background: #fff;
+    }
+    .brand-gallery-item input[type="text"]:focus { outline: none; border-color: #111827; }
+    .brand-gallery-item .btn-remove-brand {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #fee2e2; border: none; cursor: pointer;
+      color: #ef4444; font-size: 14px; display: flex;
+      align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.2s;
+    }
+    .brand-gallery-item .btn-remove-brand:hover { background: #ef4444; color: #fff; }
+    .brand-gallery-uploading { opacity: 0.6; pointer-events: none; }
+
     .form-divider {
       grid-column: 1 / -1; border: none;
       border-top: 1px solid #f3f4f6; margin: 8px 0;
@@ -448,6 +479,19 @@
                   </label>
                   <div class="gallery-grid" id="gallery-grid"></div>
                   <input type="hidden" id="p-gallery-urls" value="[]">
+                </div>
+
+                <!-- Galeria Identidade Visual — masonry com legendas -->
+                <div class="form-group span-2" id="field-brand-gallery" style="display:none;">
+                  <label>Galeria de Elementos</label>
+                  <p class="upload-hint" style="margin-bottom:12px;">Cada item tem uma imagem e uma legenda. Serão exibidos em galeria masonry na página do case.</p>
+                  <label class="gallery-add-btn" for="p-brand-gallery-input">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Adicionar imagem
+                    <input type="file" id="p-brand-gallery-input" accept="image/*" style="display:none;">
+                  </label>
+                  <div class="brand-gallery-list" id="brand-gallery-list"></div>
+                  <input type="hidden" id="p-brand-gallery-data" value="[]">
                 </div>
 
                 <div class="form-group span-2">
@@ -725,6 +769,9 @@
       galleryItems = [];
       document.getElementById('gallery-grid').innerHTML = '';
       document.getElementById('p-gallery-urls').value = '[]';
+      brandGalleryItems = [];
+      document.getElementById('brand-gallery-list').innerHTML = '';
+      document.getElementById('p-brand-gallery-data').value = '[]';
       document.getElementById('project-panel-title').textContent = id ? 'Editar Projeto' : 'Novo Projeto';
       updateCategoryFields();
 
@@ -754,23 +801,97 @@
           if (data.gallery_images && data.gallery_images.length) {
             loadGalleryFromUrls(data.gallery_images);
           }
+          if (data.brand_gallery && data.brand_gallery.length) {
+            loadBrandGalleryFromData(data.brand_gallery);
+          }
           updateCategoryFields();
         }
       }
       showEditPanel('projects-list-view', 'project-edit-panel');
     }
 
-    // ── Category toggle: single image vs gallery ──
+    // ── Category toggle ──
     function updateCategoryFields() {
       const cat = document.getElementById('p-category').value;
       const isPhoto = cat === 'Fotografia';
-      document.getElementById('field-project-image').style.display = isPhoto ? 'none' : '';
+      const isBrand = cat === 'Identidade Visual';
+      document.getElementById('field-project-image').style.display = (isPhoto || isBrand) ? 'none' : '';
       document.getElementById('field-gallery').style.display = isPhoto ? '' : 'none';
+      document.getElementById('field-brand-gallery').style.display = isBrand ? '' : 'none';
     }
     document.getElementById('p-category').addEventListener('change', updateCategoryFields);
 
-    // ── Gallery state ──
+    // ── Gallery state (Fotografia) ──
     let galleryItems = []; // { url: string, file: File|null, thumb: Element }
+
+    // ── Brand Gallery state (Identidade Visual) ──
+    let brandGalleryItems = []; // { url: string, caption: string, file: File|null, el: Element }
+
+    function renderBrandGalleryItem(url, caption = '', file = null) {
+      const row = document.createElement('div');
+      row.className = 'brand-gallery-item';
+      const img = document.createElement('img');
+      img.src = url || '';
+      img.alt = caption;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = 'Legenda (ex: Cromatismo & Contraste)';
+      input.value = caption;
+      input.addEventListener('input', syncBrandGalleryData);
+      const btnRemove = document.createElement('button');
+      btnRemove.type = 'button';
+      btnRemove.className = 'btn-remove-brand';
+      btnRemove.innerHTML = '✕';
+      btnRemove.addEventListener('click', () => {
+        brandGalleryItems = brandGalleryItems.filter(i => i.el !== row);
+        row.remove();
+        syncBrandGalleryData();
+      });
+      row.appendChild(img); row.appendChild(input); row.appendChild(btnRemove);
+      document.getElementById('brand-gallery-list').appendChild(row);
+      return row;
+    }
+
+    function syncBrandGalleryData() {
+      const data = brandGalleryItems
+        .filter(i => i.url)
+        .map(i => ({ url: i.url, caption: i.el.querySelector('input').value }));
+      document.getElementById('p-brand-gallery-data').value = JSON.stringify(data);
+    }
+
+    function loadBrandGalleryFromData(items) {
+      brandGalleryItems = [];
+      document.getElementById('brand-gallery-list').innerHTML = '';
+      (items || []).forEach(item => {
+        const el = renderBrandGalleryItem(item.url, item.caption || '');
+        brandGalleryItems.push({ url: item.url, caption: item.caption || '', file: null, el });
+      });
+      syncBrandGalleryData();
+    }
+
+    document.getElementById('p-brand-gallery-input').addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const el = renderBrandGalleryItem(e.target.result, '', file);
+        brandGalleryItems.push({ url: null, caption: '', file, el, previewUrl: e.target.result });
+      };
+      reader.readAsDataURL(file);
+      this.value = '';
+    });
+
+    async function uploadBrandGalleryImages() {
+      for (const item of brandGalleryItems) {
+        if (item.file && !item.url) {
+          item.el.classList.add('brand-gallery-uploading');
+          item.url = await uploadImage(item.file, 'portfolio-images');
+          item.el.querySelector('img').src = item.url;
+          item.el.classList.remove('brand-gallery-uploading');
+        }
+      }
+      syncBrandGalleryData();
+    }
 
     function renderGalleryItem(url, file = null) {
       const wrap = document.createElement('div');
@@ -870,14 +991,22 @@
           await uploadGalleryImages();
           galleryUrls = galleryItems.map(i => i.url).filter(Boolean);
         }
+        let brandGalleryData = [];
+        if (category === 'Identidade Visual') {
+          await uploadBrandGalleryImages();
+          brandGalleryData = brandGalleryItems
+            .filter(i => i.url)
+            .map(i => ({ url: i.url, caption: i.el.querySelector('input').value }));
+        }
 
         const payload = {
           title: document.getElementById('p-title').value.trim(),
           category,
           description: document.getElementById('p-description').value.trim(),
           image_url: imageUrl,
-          project_image_url: category === 'Fotografia' ? null : projectImageUrl,
+          project_image_url: (category === 'Fotografia' || category === 'Identidade Visual') ? null : projectImageUrl,
           gallery_images: category === 'Fotografia' ? galleryUrls : [],
+          brand_gallery: category === 'Identidade Visual' ? brandGalleryData : [],
           live_url: document.getElementById('p-live-url').value.trim(),
           challenge: document.getElementById('p-challenge').value.trim(),
           solution: document.getElementById('p-solution').value.trim(),

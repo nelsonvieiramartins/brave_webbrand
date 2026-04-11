@@ -159,10 +159,14 @@
       let allCards = [];
 
       function buildCard(project, index) {
-        const isPhoto = (project.category || '').toLowerCase() === 'fotografia';
+        const cat = (project.category || '').toLowerCase();
+        const isPhoto = cat === 'fotografia';
+        const isBrand = cat === 'identidade visual';
         const href = isPhoto
           ? `case-foto.html?id=${project.id}`
-          : (CASE_LINKS[project.title] || '#');
+          : isBrand
+            ? `case-identidade.html?id=${project.id}`
+            : (CASE_LINKS[project.title] || '#');
         const delay = delays[index % delays.length];
 
         const a = document.createElement('a');
