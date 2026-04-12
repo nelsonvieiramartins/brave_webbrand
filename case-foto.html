@@ -218,6 +218,10 @@
             <span class="case-meta-label">Serviços</span>
             <span class="case-meta-value">Fotografia · Direção de Arte · Retoque</span>
           </div>
+          <div class="case-meta-item" id="meta-authors-item" style="display:none;">
+            <span class="case-meta-label">Autores</span>
+            <span class="case-meta-value" id="meta-authors">—</span>
+          </div>
         </div>
       </div>
 
@@ -364,6 +368,10 @@
         // Meta
         document.getElementById('meta-client').textContent = data.title;
         document.getElementById('meta-year').textContent = year;
+        if (data.project_authors && data.project_authors.length) {
+          document.getElementById('meta-authors').textContent = data.project_authors.join(' · ');
+          document.getElementById('meta-authors-item').style.display = '';
+        }
 
         // Challenge & Solution
         if (data.challenge) {

@@ -190,6 +190,19 @@
       color: #fff; font-size: 11px; font-weight: 600;
     }
 
+    /* Authors chips */
+    .authors-chips { display: flex; flex-wrap: wrap; gap: 8px; min-height: 36px; }
+    .author-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border: 1.5px solid #e5e7eb; border-radius: 20px;
+      cursor: pointer; font-size: 13px; font-weight: 500;
+      background: #f9fafb; color: #374151; user-select: none;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .author-chip:hover { border-color: #9ca3af; }
+    .author-chip.selected { background: #111827; color: #fff; border-color: #111827; }
+    .authors-loading { font-size: 13px; color: #9ca3af; }
+
     /* Brand Gallery (Identidade Visual) */
     .brand-gallery-list { display: flex; flex-direction: column; gap: 12px; }
     .brand-gallery-item {
@@ -507,6 +520,17 @@
 
                 <hr class="form-divider">
 
+                <div class="form-group span-2" id="field-authors">
+                  <label>Autores do Projeto</label>
+                  <p class="upload-hint" style="margin-bottom:10px;">Selecione os membros do time responsáveis por este projeto.</p>
+                  <div class="authors-chips" id="authors-chips-container">
+                    <span class="authors-loading">Carregando time...</span>
+                  </div>
+                  <input type="hidden" id="p-authors-data" value="[]">
+                </div>
+
+                <hr class="form-divider">
+
                 <div class="form-group span-2">
                   <label for="p-challenge">Desafio</label>
                   <textarea id="p-challenge" rows="3" placeholder="Qual era o problema ou desafio do cliente?"></textarea>
@@ -780,6 +804,7 @@
       document.getElementById('p-brand-gallery-data').value = '[]';
       document.getElementById('project-panel-title').textContent = id ? 'Editar Projeto' : 'Novo Projeto';
       updateCategoryFields();
+      loadAuthorsField([]);
 
       if (id) {
         const { data } = await sb.from('portfolio_projects').select('*').eq('id', id).single();
@@ -811,10 +836,41 @@
           if (data.brand_gallery && data.brand_gallery.length) {
             loadBrandGalleryFromData(data.brand_gallery);
           }
+          loadAuthorsField(data.project_authors || []);
           updateCategoryFields();
         }
       }
       showEditPanel('projects-list-view', 'project-edit-panel');
+    }
+
+    // ── Authors chips ──
+    let _cachedTeamMembers = null;
+
+    async function loadAuthorsField(selectedNames = []) {
+      const container = document.getElementById('authors-chips-container');
+      if (!_cachedTeamMembers) {
+        container.innerHTML = '<span class="authors-loading">Carregando time...</span>';
+        const { data } = await sb.from('team_members').select('name').eq('visible', true).order('name');
+        _cachedTeamMembers = data || [];
+      }
+      container.innerHTML = '';
+      _cachedTeamMembers.forEach(member => {
+        const chip = document.createElement('span');
+        chip.className = 'author-chip' + (selectedNames.includes(member.name) ? ' selected' : '');
+        chip.dataset.name = member.name;
+        chip.textContent = member.name;
+        chip.addEventListener('click', () => {
+          chip.classList.toggle('selected');
+          syncAuthorsData();
+        });
+        container.appendChild(chip);
+      });
+      syncAuthorsData();
+    }
+
+    function syncAuthorsData() {
+      const selected = [...document.querySelectorAll('.author-chip.selected')].map(c => c.dataset.name);
+      document.getElementById('p-authors-data').value = JSON.stringify(selected);
     }
 
     // ── Category toggle ──
@@ -1015,6 +1071,7 @@
           project_image_url: (category === 'Fotografia' || isBrandCategory) ? null : projectImageUrl,
           gallery_images: category === 'Fotografia' ? galleryUrls : [],
           brand_gallery: isBrandCategory ? brandGalleryData : [],
+          project_authors: JSON.parse(document.getElementById('p-authors-data').value || '[]'),
           project_year: parseInt(document.getElementById('p-year').value) || null,
           live_url: document.getElementById('p-live-url').value.trim(),
           challenge: document.getElementById('p-challenge').value.trim(),
