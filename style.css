@@ -387,7 +387,7 @@ img {
 
 @media (min-width: 1024px) {
   .hero-image {
-    width: 45%;
+    width: 54%;
     margin-top: 0;
     position: absolute;
     right: -6%;
@@ -403,7 +403,7 @@ img {
 
 .laptop-container {
   width: 100%;
-  max-width: 800px;
+  max-width: 960px;
   aspect-ratio: 16/10;
   transform-style: preserve-3d;
 }
