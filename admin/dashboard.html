@@ -438,6 +438,7 @@
                     <option value="Identidade Visual">Identidade Visual</option>
                     <option value="Web+ID">Web+ID</option>
                     <option value="Fotografia">Fotografia</option>
+                    <option value="Exposições">Exposições</option>
                     <option value="Outro">Outro</option>
                   </select>
                 </div>
@@ -820,7 +821,7 @@
     function updateCategoryFields() {
       const cat = document.getElementById('p-category').value;
       const isPhoto = cat === 'Fotografia';
-      const isBrand = cat === 'Identidade Visual';
+      const isBrand = cat === 'Identidade Visual' || cat === 'Exposições';
       document.getElementById('field-project-image').style.display = (isPhoto || isBrand) ? 'none' : '';
       document.getElementById('field-gallery').style.display = isPhoto ? '' : 'none';
       document.getElementById('field-brand-gallery').style.display = isBrand ? '' : 'none';
@@ -997,8 +998,9 @@
           await uploadGalleryImages();
           galleryUrls = galleryItems.map(i => i.url).filter(Boolean);
         }
+        const isBrandCategory = category === 'Identidade Visual' || category === 'Exposições';
         let brandGalleryData = [];
-        if (category === 'Identidade Visual') {
+        if (isBrandCategory) {
           await uploadBrandGalleryImages();
           brandGalleryData = brandGalleryItems
             .filter(i => i.url)
@@ -1010,9 +1012,9 @@
           category,
           description: document.getElementById('p-description').value.trim(),
           image_url: imageUrl,
-          project_image_url: (category === 'Fotografia' || category === 'Identidade Visual') ? null : projectImageUrl,
+          project_image_url: (category === 'Fotografia' || isBrandCategory) ? null : projectImageUrl,
           gallery_images: category === 'Fotografia' ? galleryUrls : [],
-          brand_gallery: category === 'Identidade Visual' ? brandGalleryData : [],
+          brand_gallery: isBrandCategory ? brandGalleryData : [],
           project_year: parseInt(document.getElementById('p-year').value) || null,
           live_url: document.getElementById('p-live-url').value.trim(),
           challenge: document.getElementById('p-challenge').value.trim(),

@@ -58,6 +58,7 @@
             <button class="filter-btn" data-filter="identidade">Identidade Visual</button>
             <button class="filter-btn" data-filter="projetos">Projetos Completos (Web+ID)</button>
             <button class="filter-btn" data-filter="fotografia">Fotografia</button>
+            <button class="filter-btn" data-filter="exposicoes">Exposições</button>
           </div>
         </div>
       </section>
@@ -153,6 +154,7 @@
         'identidade': ['identidade visual', 'branding'],
         'projetos': ['web+id', 'projeto completo'],
         'fotografia': ['fotografia'],
+        'exposicoes': ['exposições', 'exposicoes'],
       };
 
       const delays = ['0ms', '100ms', '200ms'];
@@ -161,7 +163,7 @@
       function buildCard(project, index) {
         const cat = (project.category || '').toLowerCase();
         const isPhoto = cat === 'fotografia';
-        const isBrand = cat === 'identidade visual';
+        const isBrand = cat === 'identidade visual' || cat === 'exposições';
         const href = isPhoto
           ? `case-foto.html?id=${project.id}`
           : isBrand
