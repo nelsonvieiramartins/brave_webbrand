@@ -379,15 +379,21 @@
 
         // Challenge
         if (data.challenge) {
-          document.getElementById('challenge-title').textContent = data.challenge.split('.')[0] + '.';
-          document.getElementById('challenge-text').textContent = data.challenge;
+          const cTitle = data.challenge.split('.')[0].trim() + '.';
+          const cBody = data.challenge.slice(cTitle.length).trim();
+          document.getElementById('challenge-title').textContent = cTitle;
+          document.getElementById('challenge-text').textContent = cBody;
+          document.getElementById('challenge-text').style.display = cBody ? '' : 'none';
           document.getElementById('section-challenge').style.display = '';
         }
 
         // Solution
         if (data.solution) {
-          document.getElementById('solution-title').textContent = data.solution.split('.')[0] + '.';
-          document.getElementById('solution-text').textContent = data.solution;
+          const sTitle = data.solution.split('.')[0].trim() + '.';
+          const sBody = data.solution.slice(sTitle.length).trim();
+          document.getElementById('solution-title').textContent = sTitle;
+          document.getElementById('solution-text').textContent = sBody;
+          document.getElementById('solution-text').style.display = sBody ? '' : 'none';
           document.getElementById('section-solution').style.display = '';
         }
 
