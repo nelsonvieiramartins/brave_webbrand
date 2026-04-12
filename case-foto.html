@@ -454,7 +454,12 @@
         const embedUrl = getYouTubeEmbedUrl(data.video_url);
         if (embedUrl) {
           document.getElementById('video-iframe').src = embedUrl;
-          if (data.video_text) document.getElementById('video-text').textContent = data.video_text;
+          if (data.video_text) {
+            document.getElementById('video-text').textContent = data.video_text;
+          } else {
+            document.querySelector('.case-video-content').style.display = 'none';
+            document.querySelector('.case-video-section').style.gridTemplateColumns = '1fr';
+          }
           document.getElementById('section-video').style.display = '';
         }
 
