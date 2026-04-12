@@ -548,6 +548,19 @@
 
                 <hr class="form-divider">
 
+                <div class="form-group span-2">
+                  <label for="p-video-url">Vídeo (YouTube)</label>
+                  <input type="text" id="p-video-url" placeholder="https://www.youtube.com/watch?v=... ou https://youtu.be/...">
+                  <p class="upload-hint">Cole o link do YouTube. O vídeo será incorporado na página do case. Deixe vazio para não exibir.</p>
+                </div>
+
+                <div class="form-group span-2">
+                  <label for="p-video-text">Texto ao lado do vídeo</label>
+                  <textarea id="p-video-text" rows="3" placeholder="Contexto, descrição ou chamada que aparece ao lado do vídeo..."></textarea>
+                </div>
+
+                <hr class="form-divider">
+
                 <div class="form-group">
                   <label for="p-order">Ordem de exibição</label>
                   <input type="number" id="p-order" value="0" min="0">
@@ -819,6 +832,8 @@
           document.getElementById('p-challenge').value = data.challenge || '';
           document.getElementById('p-solution').value = data.solution || '';
           document.getElementById('p-result').value = data.result || '';
+          document.getElementById('p-video-url').value = data.video_url || '';
+          document.getElementById('p-video-text').value = data.video_text || '';
           document.getElementById('p-order').value = data.sort_order || 0;
           document.getElementById('p-visible').checked = data.visible !== false;
           if (data.image_url) {
@@ -1077,6 +1092,8 @@
           challenge: document.getElementById('p-challenge').value.trim(),
           solution: document.getElementById('p-solution').value.trim(),
           result: document.getElementById('p-result').value.trim(),
+          video_url: document.getElementById('p-video-url').value.trim() || null,
+          video_text: document.getElementById('p-video-text').value.trim() || null,
           sort_order: parseInt(document.getElementById('p-order').value) || 0,
           visible: document.getElementById('p-visible').checked,
         };

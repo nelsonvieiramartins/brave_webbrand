@@ -159,6 +159,7 @@
       .case-result-box { padding: 40px 28px; }
       .case-next { padding: 56px 20px; }
       .case-brand-gallery-header { flex-direction: column; }
+      .case-video-section { grid-template-columns: 1fr; }
     }
 
     /* ── Lightbox ── */
@@ -222,6 +223,21 @@
 
     /* make masonry items clickable */
     .masonry-img-wrapper { cursor: zoom-in; }
+    .case-video-section {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 48px; align-items: center; margin-bottom: 80px;
+    }
+    .case-video-embed {
+      position: relative; padding-bottom: 56.25%; height: 0;
+      overflow: hidden; border-radius: 16px; background: #000;
+    }
+    .case-video-embed iframe {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%; border: 0;
+    }
+    .case-video-content p {
+      font-size: 1rem; line-height: 1.75; color: var(--color-gray-600); margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -333,6 +349,21 @@
             <span id="live-link-text"></span>
             <iconify-icon icon="lucide:arrow-up-right"></iconify-icon>
           </a>
+        </div>
+
+        <div class="case-section reveal-up" id="section-video" style="display:none; animation-delay:60ms;">
+          <span class="case-label">Vídeo</span>
+          <hr class="case-divider">
+          <div class="case-video-section">
+            <div class="case-video-embed">
+              <iframe id="video-iframe" src="" title="Vídeo do projeto"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen></iframe>
+            </div>
+            <div class="case-video-content">
+              <p id="video-text"></p>
+            </div>
+          </div>
         </div>
 
         <div class="case-next reveal-up" style="animation-delay:40ms;">
@@ -497,7 +528,30 @@
           document.getElementById('section-live').style.display = '';
         }
 
+        // Video
+        const embedUrl = getYouTubeEmbedUrl(data.video_url);
+        if (embedUrl) {
+          document.getElementById('video-iframe').src = embedUrl;
+          if (data.video_text) document.getElementById('video-text').textContent = data.video_text;
+          document.getElementById('section-video').style.display = '';
+        }
+
         document.getElementById('case-main').style.opacity = '1';
+      }
+
+      function getYouTubeEmbedUrl(url) {
+        if (!url) return null;
+        const patterns = [
+          /youtu\.be\/([^?&\s]+)/,
+          /[?&]v=([^&\s]+)/,
+          /youtube\.com\/embed\/([^?&\s]+)/,
+          /youtube\.com\/shorts\/([^?&\s]+)/,
+        ];
+        for (const p of patterns) {
+          const m = url.match(p);
+          if (m) return `https://www.youtube.com/embed/${m[1]}?rel=0`;
+        }
+        return null;
       }
 
       loadProject();
